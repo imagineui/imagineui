@@ -32,6 +32,9 @@
   "dependencies": {
     "commander": "^2.19.0",
     "lodash": "^4.17.11",
+    "svg.js": "^2.6.6",
+    "svgdom": "0.0.15",
     "ts-node": "^7.0.1",
+    "yoga-layout": "^1.9.3"
   }
 }
