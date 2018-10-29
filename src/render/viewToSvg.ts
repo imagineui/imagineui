@@ -13,8 +13,8 @@ interface Position {
 }
 
 const defaultPosition = {
-    top: 0,
-    left: 0,
+    top: 8,
+    left: 8,
 };
 
 function addOffset(position: Position, top: number, left: number): Position {

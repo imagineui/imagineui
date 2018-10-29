@@ -1,0 +1,55 @@
+key: messages_screen
+areas:
+  - item:
+      key: nav_bar
+      type: navigate
+    priorityWeight: 1
+  - item:
+      key: item_list
+      type: interact
+      interaction:
+        entity:
+          key: message_type
+          fields:
+            - item:
+                key: amount_left
+                mutable: false
+                type: number
+                size: small
+              priorityWeight: 1
+            - item:
+                key: description
+                mutable: false
+                type: text
+                size: large
+              priorityWeight: 1
+            - item:
+                key: name
+                mutable: false
+                type: text
+                size: small
+              priorityWeight: 3
+            - item:
+                key: photo
+                mutable: false
+                type: image
+                size: large
+              priorityWeight: 3
+            - item: &ref_0
+                key: price
+                mutable: false
+                type: number
+                size: small
+              priorityWeight: 3
+        primaryAction: browse
+        actions:
+          - read
+    priorityWeight: 5
+  - item:
+      key: item_filters
+      type: options
+      fields:
+        - item: *ref_0
+          priorityWeight: 1
+    priorityWeight: 1
+connectedScenes: []

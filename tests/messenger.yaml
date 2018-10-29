@@ -1,0 +1,46 @@
+key: messages_screen
+areas:
+  - item:
+      key: nav_bar
+      type: navigate
+    priorityWeight: 1
+  - item:
+      key: messages_list
+      type: interact
+      interaction:
+        entity: &ref_0
+          key: message_type
+          fields:
+            - item:
+                key: avatar
+                mutable: false
+                type: image
+                size: small
+              priorityWeight: 1
+            - item:
+                key: name
+                mutable: false
+                type: text
+                size: small
+              priorityWeight: 3
+            - item:
+                key: content
+                mutable: true
+                type: text
+                size: large
+              priorityWeight: 3
+        primaryAction: browse
+        actions:
+          - edit
+          - delete
+    priorityWeight: 5
+  - item:
+      key: message_input
+      type: interact
+      interaction:
+        entity: *ref_0
+        primaryAction: add
+        actions:
+          - edit
+    priorityWeight: 3
+connectedScenes: []

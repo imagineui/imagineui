@@ -15,14 +15,11 @@ program
     .parse(process.argv);
 
 const guider = new AreaGuider(new EntityGuider());
-
-const scene = describeSceneFromAST();
+const scene = describeSceneFromAST(program.input);
 const layout = guider.sceneToLayout(scene);
-
 const view = calculateLayout(layout);
 const data = new ViewRenderer().renderView(view);
 
-console.log(program.output);
 
 fs.writeFile(program.output, data, (err) => {
     if (err) {
@@ -30,4 +27,5 @@ fs.writeFile(program.output, data, (err) => {
     }
 
     console.log('Render complete!');
+    console.log(program.output);
 });
