@@ -43,6 +43,7 @@ function measuredToView(measured: MeasuredLayout): View {
     }
 
     return {
+        key: layout.key,
         type,
         children: measured.measuredChildren.map(measuredToView),
         layout: measured.node.getComputedLayout(),

@@ -1,4 +1,4 @@
-import {Entity, Field, FieldWithPriority} from '../../types/logic';
+import {Action, Entity, Field, FieldWithPriority} from '../../types/logic';
 import {Constraints, LayoutItem, LayoutItemType, LimitTier} from '../../types/inflate';
 import * as _ from 'lodash';
 import {EntityGuider} from '../../types/guide';
@@ -20,6 +20,11 @@ export function fieldPriority(a: FieldWithPriority, b: FieldWithPriority) {
     }
 }
 
+const fieldPredicates = {
+    allPass: (field: Field) => true,
+    mutableOnly: (field: Field) => field.mutable,
+};
+
 export enum DevFixedWeights {
     LIGHT = 1,
     MEDIUM = 2,
@@ -35,12 +40,14 @@ export default class DevEntityGuider implements EntityGuider {
         }
         if (a.weight + b.weight < DEV_LINE_BREAK_WEIGHT) {
             return {
+                key: 'group',
                 type: LayoutItemType.HORIZONTAL_GROUP,
                 weight: a.weight + b.weight,
                 items: [a, b],
             };
         } else {
             return {
+                key: 'group',
                 type: LayoutItemType.VERTICAL_GROUP,
                 weight: _.max([a.weight, b.weight]),
                 items: [a, b],
@@ -81,19 +88,21 @@ export default class DevEntityGuider implements EntityGuider {
                 widgetSubset = widgets.slice(0, _.min([widgets.length, 2]));
         }
 
-        return widgetSubset.reduceRight((prev, cur) => DevEntityGuider.widgetPairToGroup(prev, cur));
+        return widgetSubset.reduce((prev, cur) => DevEntityGuider.widgetPairToGroup(prev, cur));
     }
 
     public fieldToLayout(field: Field, constraints: Constraints): LayoutItem {
         switch (field.type) {
             case 'image':
                 return {
+                    key: field.key,
                     type: LayoutItemType.CONTENT,
                     weight: this.blockWeight(field.size, constraints),
                     contentType: 'block',
                 };
             default:
                 return {
+                    key: field.key,
                     type: LayoutItemType.CONTENT,
                     weight: this.spanWeight(field.size, constraints),
                     contentType: 'span',
@@ -101,9 +110,19 @@ export default class DevEntityGuider implements EntityGuider {
         }
     }
 
-    public entityToLayout(entity: Entity, constraints: Constraints): LayoutItem {
+    public entityToLayout(entity: Entity, constraints: Constraints, action: Action): LayoutItem {
         const sortedFields = entity.fields.sort(fieldPriority).map((it) => it.item);
-        const widgets = sortedFields.map((it) => this.fieldToLayout(it, constraints));
+
+        let fieldPredicate;
+        if (action === 'edit' || action === 'add') {
+            fieldPredicate = fieldPredicates.mutableOnly;
+        } else {
+            fieldPredicate = fieldPredicates.allPass;
+        }
+
+        const filteredFields = sortedFields.filter(fieldPredicate);
+
+        const widgets = filteredFields.map((it) => this.fieldToLayout(it, constraints));
         return this.collapseLayouts(widgets, constraints);
     }
 }

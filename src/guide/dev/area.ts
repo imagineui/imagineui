@@ -1,13 +1,14 @@
 import {AreaGuider, EntityGuider} from '../../types/guide';
 import {Constraints, LayoutItem, LayoutItemType, LimitTier, NavLink} from '../../types/inflate';
 import {
-AreaType,
-AreaWithPriority,
-Entity,
-InteractionArea,
-NavArea,
-OptionsArea,
-SceneDescription,
+    Action,
+    AreaType,
+    AreaWithPriority,
+    Entity,
+    InteractionArea,
+    NavArea,
+    OptionsArea,
+    SceneDescription,
 } from '../../types/logic';
 
 const listConstraints: Constraints = {
@@ -46,10 +47,11 @@ export default class DevAreaGuider implements AreaGuider {
         };
     }
 
-    private static stackLayouts(layoutItems: LayoutItem[], weight: number, scrollable: boolean): LayoutItem {
+    private static stackLayouts(layoutItems: LayoutItem[], scrollable: boolean): LayoutItem {
         return {
+            key: 'group',
             type: LayoutItemType.VERTICAL_GROUP,
-            weight,
+            weight: 1,
             items: layoutItems,
             reverse: false,
             scrollable,
@@ -91,26 +93,33 @@ export default class DevAreaGuider implements AreaGuider {
             }
         });
 
-        return DevAreaGuider.stackLayouts(areaLayouts, 1, false);
+        return DevAreaGuider.stackLayouts(areaLayouts, false);
     }
 
     public interactionToLayout(area: InteractionArea, isPrimary: boolean): LayoutItem {
         const { entity, primaryAction, actions } = area.interaction;
 
-        const calculateLayout = (e: Entity, constraints: Constraints) =>
-            this.entityGuider.entityToLayout(e, DevAreaGuider.adjustConstraints(constraints, isPrimary));
+        const calculateLayout = (e: Entity, constraints: Constraints, action: Action) =>
+            this.entityGuider.entityToLayout(e, DevAreaGuider.adjustConstraints(constraints, isPrimary), action);
 
+        let rootLayout;
         switch (primaryAction) {
             case 'browse':
-                const entityLayouts = [entity, entity, entity].map((it) => calculateLayout(it, listConstraints));
-                return DevAreaGuider.stackLayouts(entityLayouts, 5, true);
+                const entityLayouts = [entity, entity, entity, entity, entity]
+                    .map((it) => calculateLayout(it, listConstraints, primaryAction));
+                rootLayout = DevAreaGuider.stackLayouts(entityLayouts, true);
+                break;
             default:
-                return calculateLayout(entity, cardConstraints);
+                rootLayout = calculateLayout(entity, cardConstraints, primaryAction);
+                break;
         }
+        rootLayout.weight = isPrimary ? 5 : 1;
+        return rootLayout;
     }
 
     public navigationToLayout(area: NavArea, isPrimary: boolean, navLinks: NavLink[]): LayoutItem {
         return {
+            key: 'nav_area_span',
             type: LayoutItemType.CONTENT,
             weight: 1,
             contentType: 'span',
@@ -119,6 +128,7 @@ export default class DevAreaGuider implements AreaGuider {
 
     public optionsToLayout(area: OptionsArea, isPrimary: boolean): LayoutItem {
         return {
+            key: 'opts_area_span',
             type: LayoutItemType.CONTENT,
             weight: 1,
             contentType: 'span',

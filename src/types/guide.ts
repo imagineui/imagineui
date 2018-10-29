@@ -1,11 +1,11 @@
 import { DevFixedWeights } from '../guide/dev/entity';
 import {Constraints, LayoutItem, NavLink} from './inflate';
-import {Area, Entity, Field, InteractionArea, NavArea, OptionsArea, SceneDescription} from './logic';
+import {Action, Area, Entity, Field, InteractionArea, NavArea, OptionsArea, SceneDescription} from './logic';
 
 // TODO: Define UI guideline API
 export interface EntityGuider {
     fieldToLayout(field: Field, constraints: Constraints): LayoutItem;
-    entityToLayout(entity: Entity, constraints: Constraints): LayoutItem;
+    entityToLayout(entity: Entity, constraints: Constraints, action: Action): LayoutItem;
     collapseLayouts(widgets: LayoutItem[], constraints: Constraints): LayoutItem;
     blockWeight(size: 'small' | 'large', constraints: Constraints): DevFixedWeights;
     spanWeight(size: 'small' | 'large', constraints: Constraints): DevFixedWeights;

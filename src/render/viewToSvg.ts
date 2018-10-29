@@ -42,6 +42,13 @@ export default class ViewRenderer {
             case 'text':
                 rect.fill('black')
                     .opacity(0.1);
+
+                const key = this.draw.text(view.key)
+                    .font({
+                        family: 'Helvetica',
+                        size: 12,
+                    })
+                    .move(position.left + 4, position.top + 4);
                 break;
             case 'wire':
                 rect.fill('#00000000')

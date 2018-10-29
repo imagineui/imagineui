@@ -10,12 +10,14 @@ export enum LayoutItemType {
 export type LayoutItem = VerticalGroup | HorizontalGroup | Content;
 
 export interface HorizontalGroup {
+    key: string;
     type: LayoutItemType.HORIZONTAL_GROUP;
     weight: number;
     items: LayoutItem[];
 }
 
 export interface VerticalGroup {
+    key: string;
     type: LayoutItemType.VERTICAL_GROUP;
     weight: number;
     items: LayoutItem[];
@@ -24,6 +26,7 @@ export interface VerticalGroup {
 }
 
 export interface Content {
+    key: string;
     type: LayoutItemType.CONTENT;
     weight: number;
     contentType: 'span' | 'block';
@@ -41,6 +44,7 @@ export interface Constraints {
 }
 
 export interface View {
+    key: string;
     type: 'text' | 'wire' | 'solid';
     children: View[];
     layout: {
