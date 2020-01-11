@@ -6,3 +6,11 @@ import {SceneDescription} from '../types/logic';
 export function describeSceneFromAST(inputPath: string): SceneDescription {
     return yaml.safeLoad(fs.readFileSync(inputPath, 'utf8'));
 }
+
+export function parseSceneFromText(sceneText: string): SceneDescription {
+    return {
+        key: sceneText,
+        areas: [],
+        connectedScenes: []
+    }
+}

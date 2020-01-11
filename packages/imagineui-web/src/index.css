@@ -1,0 +1,18 @@
+.playground {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: "input wireframe" "output wireframe";
+    grid-gap: 8px;
+}
+
+.input { grid-area: input; }
+
+.output {
+    white-space: pre-line;
+    background-color: #333;
+    border: antiquewhite 1px solid;
+    color: antiquewhite;
+}
+
+.wireframe { grid-area: wireframe; }

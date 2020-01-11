@@ -1,10 +1,10 @@
 import program from 'commander';
 import * as fs from 'fs';
-import {describeSceneFromAST} from './parse/ast';
-import AreaGuider from './guide/dev/area';
-import EntityGuider from './guide/dev/entity';
-import calculateLayout from './render/viewCalculation';
-import ViewRenderer from './render/viewToSvg';
+import {describeSceneFromAST} from '../../imagineui-core/src/parse/ast';
+import AreaGuider from '../../imagineui-core/src/guide/dev/area';
+import EntityGuider from '../../imagineui-core/src/guide/dev/entity';
+import calculateLayout from '../../imagineui-core/src/render/viewCalculation';
+import ViewRenderer from '../../imagineui-core/src/render/viewToSvg';
 
 program
     .version('0.1.0', '-v, --version')

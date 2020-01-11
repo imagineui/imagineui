@@ -1,0 +1,19 @@
+{
+  "name": "imagineui-core",
+  "version": "0.2.0",
+  "description": "",
+  "author": "vadkou",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.117",
+    "@types/node": "^10.12.0",
+    "tslint": "^5.20.0",
+    "typescript": "3.7.3"
+  },
+  "dependencies": {
+    "js-yaml": "^3.12.0",
+    "lodash": "^4.17.11",
+    "preact": "^10.0.1",
+    "wired-elements": "^2.0.0"
+  }
+}

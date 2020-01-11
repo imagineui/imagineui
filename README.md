@@ -6,7 +6,7 @@ CLI tool to generate wireframes from a localized human-readable format
 ### Basic concepts
 
 * Scene (.scene) – Describes entities and general areas designed to allow user to access certain features.
-[Details in code](src/types/logic.ts)
+[Details in code](packages/imagineui-core/src/types/logic.ts)
 * Guides (.guide) – Target-specific instructions for building layouts (i.e. to accommodate screen resolution, UI guidelines, etc.)
 
 #### Principles

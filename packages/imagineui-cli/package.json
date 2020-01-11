@@ -1,0 +1,22 @@
+{
+  "name": "imagineui-cli",
+  "version": "0.2.0",
+  "description": "CLI tool to generate mock-ups from a localized human-readable format",
+  "scripts": {
+    "start": "ts-node ./src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vadkou",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/js-yaml": "^3.11.2",
+    "@types/node": "^12.11.2",
+    "tslint": "^5.20.0",
+    "typescript": "3.7.3"
+  },
+  "dependencies": {
+    "commander": "^2.19.0",
+    "ts-node": "^7.0.1"
+  }
+}

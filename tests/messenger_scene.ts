@@ -1,4 +1,4 @@
-import {Area, AreaType, Entity, Field, Interaction, SceneDescription, withPriority} from '../src/types/logic';
+import {Area, AreaType, Entity, Field, Interaction, SceneDescription, withPriority} from '../packages/imagineui-core/src/types/logic';
 
 export function createMessengerScene(): SceneDescription {
     const name: Field = {
