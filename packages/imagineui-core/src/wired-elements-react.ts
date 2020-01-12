@@ -3,14 +3,20 @@ import 'wired-elements';
 import {PreactElement} from "preact/src/internal";
 import {ClassAttributes} from "preact";
 
+/**
+ * Soft fork of https://github.com/SammyLiang97/react-wired-element
+ */
+
 type WIRED_ELEMENT_LIST =
     'wired-button' |
     'wired-card' |
     'wired-checkbox' |
     'wired-combo' |
+    'wired-divider' |
     'wired-icon-button' |
     'wired-input' |
     'wired-item' |
+    'wired-image' |
     'wired-listbox' |
     'wired-progress' |
     'wired-radio' |
@@ -29,11 +35,15 @@ const wiredComponentCreator = <P>(element: WIRED_ELEMENT_LIST) => (props: P & { 
     props.children
 );
 
-export const WiredCard = wiredComponentCreator<{ elevation?: number }>('wired-card');
+export const WiredCard = wiredComponentCreator<{ elevation?: number, fill?: string }>('wired-card');
 
 export const WiredCombo = wiredComponentCreator<{ value?: object, selected?: string, disabled?: boolean }>('wired-combo');
 
+export const WiredDivider = wiredComponentCreator<{elevation?: number}>('wired-divider');
+
 export const WiredItem = wiredComponentCreator<{ text: string, value: string }>('wired-item');
+
+export const WiredImage = wiredComponentCreator<{ text: string, value: string }>('wired-image');
 
 export const WiredInput = wiredComponentCreator<{
     placeholder?: string,

@@ -114,10 +114,11 @@ const syntax = `
 </plist>
 `
 
-const helpContent = `
-Страница: Справка
+const helpContent =
+`Страница: Справка
 Главный Блок: Каталог
-Поле ввода поискового запроса с иконкой Search
+    Кнопка
+    Поле ввода поискового запроса с иконкой Search
     Список тем
     Тема состоит из
         Заголовка
@@ -130,7 +131,34 @@ const helpContent = `
 Блок: Навигация
     Картинка Логотип
     Заголовок Справка
-    Ссылка на чат с поддержкойНавигация расположена в шапке
+    Ссылка на чат с поддержкой
+    
+Навигация расположена в шапке
+`
+
+const loginContent =
+`Экран: Авторизация
+Главный Блок: Вход
+    Картинка Логотип
+    Заголовок
+    Поле e-mail или номера телефона
+    Поле ввода пароля
+    Кнопка "Войти"
+Блок: Сервис
+    Кнопка восстановления доступа
+    Кнопка регистрации
+    "2020 @vadkou"
+Блок: Справка
+    Список тем
+        состоит из
+            Заголовка
+            <Ссылки на статью>
+
+    
+// Блоки расположены по вертикали // Сетка пока в разработке
+
+// Схема на русском языке для демонстрации заложенной возможности 
+// локализованных вариаций языка по типу Gherkin
 `
 
 export async function liftOff(container: HTMLElement) {
@@ -161,16 +189,19 @@ export async function liftOff(container: HTMLElement) {
     await wireTmGrammars(monaco, registry, grammars)
 
     return monaco.editor.create(container, {
-        value: helpContent,
+        value: loginContent,
         language: 'imagineui_scene' // this won't work out of the box, see below for more info
     })
 }
 
-export const Editor = () => {
+export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentChangedEvent, editor: monaco.editor.IStandaloneCodeEditor) => void}) => {
     const container = useRef<HTMLDivElement>()
     useEffect(() => {
         if(container.current) {
-            liftOff(container.current)
+            liftOff(container.current).then(editor => {
+                editor.onDidChangeModelContent((ev) => onChange(ev, editor))
+                editor.getModel()!.setValue(loginContent)
+            })
         }
     }, [container])
 
