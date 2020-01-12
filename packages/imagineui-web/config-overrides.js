@@ -5,6 +5,11 @@ const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 /* config-overrides.js */
 module.exports = function override(config, env) {
+    // TODO: Webpack WASM loader https://github.com/webpack/webpack/issues/7352
+    config.module.rules.push({
+        test: /\.xml$/i,
+        use: 'raw-loader',
+    },)
     config.resolve = {
         ...config.resolve,
         "alias": {

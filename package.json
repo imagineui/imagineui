@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "start": "./node_modules/ts-node/dist/bin.js packages/imagineui-cli/src/app.ts",
+    "dev-web": "yarn workspace imagineui-web start",
     "test": "test"
   },
   "repository": {

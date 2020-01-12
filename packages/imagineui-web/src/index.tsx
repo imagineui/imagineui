@@ -4,6 +4,7 @@ import {Wireframe} from "imagineui-core/src/wireframe";
 import {SceneDescription} from "imagineui-core/src/types/logic";
 import {parseSceneFromText} from "imagineui-core/src/parse/ast";
 import './index.css';
+import {Editor} from "./editor";
 
 const NULL_SCENE: SceneDescription = {
     key: 'NULL',
@@ -29,7 +30,7 @@ const Playground = () => {
         }
     }, [sceneText, setParseMessage, setSceneAST])
     return <div className="playground">
-        <textarea className="input" onChange={onChange} value={sceneText}/>
+        <Editor/>
         <div className="output">{parseMessage}</div>
         <Wireframe className="wireframe" sceneDescription={sceneAST}/>
     </div>
