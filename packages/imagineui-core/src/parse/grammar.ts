@@ -13,7 +13,7 @@ const FIELD = /(\s+[Пп]оле ввода\s?|[Пп]оле ввода|\s+[Пп]�
 const BUTTON = /(\s+[Кк]нопка|[Кк]нопка|\s+[Сс]ылка|[Сс]ылка)/
 const LIST = /(\s+[Сс]писок|[Сс]писок)/
 const IMAGE = /(\s+[Кк]артинка|[Кк]артинка)/
-const CONSISTS_OF = /(состоит из)/
+const CONSISTS_OF = /(включает в себя)/
 const ALIGNED = /(расположены по)/
 const WITH_ICON = /(с иконкой)/
 //const KEYWORDS = /$${__PAGE} | $${__BLOCK} | $${__MAIN} | $${__HEADER} | $${__FIELD} | $${__BUTTON} | $${__LIST} | $${__IMAGE} | $${__CONSISTS_OF} | $${__ALIGNED} | $${__EXAMPLE} | $${__WITH_ICON}__VARIABLE \= (\$<.+>)/
@@ -94,6 +94,7 @@ export class SceneParser extends Parser {
     readonly value!: (idx: number) => any;
     readonly list!: (idx: number) => any;
     readonly comment!: (idx: number) => any;
+    readonly literal!: (idx: number) => any;
 
     constructor() {
         super(sceneTokens, {
@@ -103,11 +104,13 @@ export class SceneParser extends Parser {
         const $ = this;
 
         $.RULE("scene", () => {
-            $.OR([
-                {ALT: () => $.SUBRULE($.page)},
-                {ALT: () => $.SUBRULE($.comment)},
-                {ALT: () => $.CONSUME(LineEnd)}
-            ]);
+            $.MANY(() => {
+                $.OR([
+                    {ALT: () => $.SUBRULE($.page)},
+                    {ALT: () => $.SUBRULE($.comment)},
+                    {ALT: () => $.CONSUME(LineEnd)}
+                ]);
+            });
         });
 
         $.RULE("page", () => {
@@ -139,17 +142,18 @@ export class SceneParser extends Parser {
         });
 
         $.RULE("item", () => {
-            $.OPTION1(() => {
-                $.OR([
-                    {ALT: () => $.CONSUME(Field)},
-                    {ALT: () => $.CONSUME(Button)},
-                    {ALT: () => $.CONSUME(Header)},
-                    {ALT: () => $.CONSUME(Image)}
-                ]);
-            })
-            $.OPTION2(() => {
-                $.SUBRULE($.value);
-            })
+            $.OR1([
+                {ALT: () => {
+                    $.OR2([
+                            {ALT: () => $.CONSUME(Field)},
+                            {ALT: () => $.CONSUME(Button)},
+                            {ALT: () => $.CONSUME(Header)},
+                            {ALT: () => $.CONSUME(Image)}
+                        ]);
+                    $.OPTION(() => $.SUBRULE($.value))
+                    }},
+                {ALT: () => $.SUBRULE($.literal)},
+            ]);
             $.CONSUME(LineEnd);
         });
 
@@ -182,29 +186,21 @@ export class SceneParser extends Parser {
             $.CONSUME(List);
             $.OPTION2(() => {
                 $.SUBRULE1($.value);
-                $.CONSUME(LineEnd);
+                $.CONSUME1(LineEnd);
             })
-            // $.SUBRULE2($.value);
             $.CONSUME(ConsistsOf);
-             // $.MANY_SEP({
-             //   SEP: Comma, DEF: () => {
-             //     $.SUBRULE($.value);
-             //   }
-             // });
+            $.CONSUME2(LineEnd);
             $.MANY(() => {
                 $.SUBRULE2($.item);
             });
         });
 
-        //$.RULE("array", () => {
-        //  $.CONSUME(LSquare);
-        //  $.MANY_SEP({
-        //    SEP: Comma, DEF: () => {
-        //      $.SUBRULE($.value);
-        //    }
-        //  });
-        //  $.CONSUME(RSquare);
-        //});
+        $.RULE("literal", () => {
+            $.OR([
+                {ALT: () => $.CONSUME(StringLiteral)},
+                {ALT: () => $.CONSUME(Variable)},
+            ]);
+        });
 
         $.RULE("value", () => {
             $.OR([
@@ -217,7 +213,7 @@ export class SceneParser extends Parser {
 
         $.RULE("comment", () => {
             $.CONSUME(Comment);
-            $.CONSUME(LineEnd);
+            $.OPTION(() => $.CONSUME(LineEnd))
         })
 
         this.performSelfAnalysis();

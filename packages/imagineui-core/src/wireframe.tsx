@@ -10,14 +10,16 @@ interface WireframeProps {
 // <WiredInput placeholder="Placeholder"/>
 
 const Item = ({item}: {item: ParseItem}) => {
-    const {Button, Field, Image, Header, value} = item.children;
+    const {Button, Field, Image, Header, value, literal} = item.children;
 
+
+    let textEl = value || literal;
     let text = undefined;
-    if(value) {
-        const {NaturalLiteral, StringLiteral, Variable} = value[0].children;
-
-        if(NaturalLiteral)
-            text = NaturalLiteral[0].image
+    if(value && value[0].children.NaturalLiteral) {
+        const {NaturalLiteral} = value[0].children;
+        text = NaturalLiteral[0].image
+    } else if(textEl) {
+        const {StringLiteral, Variable} = textEl[0].children;
         if(StringLiteral)
             text = StringLiteral[0].image.substring(1, StringLiteral[0].image.length-1)
         if(Variable)
@@ -47,7 +49,7 @@ const Item = ({item}: {item: ParseItem}) => {
         </WiredCard>
     }
 
-    if(text) {
+    if(literal) {
         return <div>
             {text}
         </div>
@@ -58,7 +60,9 @@ const Item = ({item}: {item: ParseItem}) => {
 
 const List = ({list}: {list: ParseList}) => {
     if(list.children.item) {
-        return list.children.item.map(item => <Item item={item}/>)
+        return <>
+            {list.children.item.map(item => <Item item={item}/>)}
+        </>
     }
 
     return <div>{list.children.List[0].image}</div>
@@ -74,10 +78,12 @@ const Block = ({block}: {block: ParseBlock}) => {
         </> )}
     </>
 }
-const Page = ({page}: {page: ParsePage}) => page.children.block.map((block,i) => <>
-    <Block block={block}/>
-    {i !== page.children.block.length - 1 ? <WiredDivider/> : null}
-    </>)
+const Page = ({page}: {page: ParsePage}) => <>{
+        page.children.block.map((block,i) => <>
+            <Block block={block}/>
+            {i !== page.children.block.length - 1 ? <WiredDivider/> : null}
+        </>)
+    }</>
 
 export const Wireframe = ({sceneDescription, className}: WireframeProps) => {
     return <div className={className}>

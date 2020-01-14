@@ -1,7 +1,6 @@
 import * as React from "preact/compat";
 import 'wired-elements';
-import {PreactElement} from "preact/src/internal";
-import {ClassAttributes} from "preact";
+import {ClassAttributes, ComponentChildren} from "preact";
 
 /**
  * Soft fork of https://github.com/SammyLiang97/react-wired-element
@@ -28,7 +27,7 @@ type WIRED_ELEMENT_LIST =
     ;
 
 
-const wiredComponentCreator = <P>(element: WIRED_ELEMENT_LIST) => (props: P & { children?: PreactElement } & { [key: string]: any }) => React.createElement<ClassAttributes<P>>(
+const wiredComponentCreator = <P>(element: WIRED_ELEMENT_LIST) => (props: P & { children?: ComponentChildren } & { [key: string]: any }) => React.createElement<ClassAttributes<P>>(
 // @ts-ignore
     element,
     props,

@@ -17,6 +17,14 @@ export function parseSceneFromText(sceneText: string): SceneDescription {
     }
 }
 
+interface ParseText {
+    children: {
+        StringLiteral: [IToken]
+        Variable: [IToken]
+    }
+    name: 'text'
+}
+
 interface ParseTextValue {
     children: {
         NaturalLiteral: [IToken]
@@ -33,6 +41,7 @@ export interface ParseItem {
         Image?: [IToken]
         Header?: [IToken]
         value?: [ParseTextValue]
+        literal? : [ParseText]
     }
     name: 'item'
 }

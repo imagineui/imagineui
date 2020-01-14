@@ -1,4 +1,4 @@
-import React, {render, useCallback, useState} from 'preact/compat';
+import React, {render, useCallback, useState, createContext} from 'preact/compat';
 import {Wireframe} from "imagineui-core/src/wireframe";
 import {SceneDescription} from "imagineui-core/src/types/logic";
 import {parseSceneToAST, ParseValue} from "imagineui-core/src/parse/ast";
@@ -7,19 +7,13 @@ import {Editor} from "./editor";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import {MarkerSeverity} from "monaco-editor";
 
-const NULL_SCENE: SceneDescription = {
-    key: 'NULL',
-    areas: [],
-    connectedScenes: []
-}
-
 const Playground = () => {
     const [sceneAST, setSceneAST] = useState<ParseValue | null>(null)
     const onChange = useCallback((ev: monaco.editor.IModelContentChangedEvent, editor: monaco.editor.IStandaloneCodeEditor) => {
         // TODO: Consider incremental compilation with ev.changes to speed up the parsing/rendering
         // TODO: Move the parsing code to the Monaco Editor Worker
         try {
-            const ast = parseSceneToAST(editor.getValue())
+            const ast = parseSceneToAST(editor.getValue() + '\n')
 
             if(ast.lexErrors) {
                 monaco.editor.setModelMarkers(editor.getModel()!, 'imagineui', ast.lexErrors.map((error) => ({
@@ -31,7 +25,7 @@ const Playground = () => {
                     endColumn: error.column || 0,
                 })))
 
-                console.log(ast)
+                console.error(ast)
             }
             if(ast.parseErrors) {
                 monaco.editor.setModelMarkers(editor.getModel()!, 'imagineui', ast.parseErrors.map((error) => ({
@@ -43,7 +37,7 @@ const Playground = () => {
                     endColumn: error.token.endColumn || 0,
                 })))
 
-                console.log(ast)
+                console.error(ast)
             }
 
             if (!ast.lexErrors && !ast.parseErrors && ast.value) {
@@ -51,7 +45,7 @@ const Playground = () => {
                 setSceneAST(ast.value)
             }
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }, [setSceneAST])
 
