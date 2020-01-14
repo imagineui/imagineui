@@ -1,4 +1,4 @@
-import React from "preact/compat";
+import React, {createContext, useContext} from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
 import {ParseBlock, ParseItem, ParseList, ParsePage, ParseValue} from "./parse/ast";
 import {wireframeContext} from "./nlp/nlp-store";
