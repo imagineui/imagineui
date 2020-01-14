@@ -16,5 +16,8 @@
     "lodash": "^4.17.11",
     "preact": "^10.0.1",
     "wired-elements": "^2.0.0"
+  },
+  "peerDependencies": {
+    "az": "^0.2.3"
   }
 }

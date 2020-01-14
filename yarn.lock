@@ -1964,6 +1964,10 @@ axobject-query@^2.0.2:
     "@babel/runtime" "^7.7.4"
     "@babel/runtime-corejs3" "^7.7.4"
 
+az@OverDrive1g/Az.js#e2acb5d1b6e74c97ba5ffa72d57c9106367eade6:
+  version "0.2.3"
+  resolved "https://codeload.github.com/OverDrive1g/Az.js/tar.gz/e2acb5d1b6e74c97ba5ffa72d57c9106367eade6"
+
 babel-code-frame@^6.22.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-code-frame/-/babel-code-frame-6.26.0.tgz#63fd43f7dc1e3bb7ce35947db8fe369a3f58c74b"

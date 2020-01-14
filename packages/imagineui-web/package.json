@@ -25,7 +25,8 @@
     "monaco-editor-textmate": "^2.2.1",
     "monaco-textmate": "^3.0.1",
     "onigasm": "^2.2.4",
-    "react-scripts": "^3.3.0"
+    "react-scripts": "^3.3.0",
+    "az": "OverDrive1g/Az.js#e2acb5d1b6e74c97ba5ffa72d57c9106367eade6"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -1,6 +1,7 @@
 import React from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
 import {ParseBlock, ParseItem, ParseList, ParsePage, ParseValue} from "./parse/ast";
+import {wireframeContext} from "./nlp/nlp-store";
 
 interface WireframeProps {
     sceneDescription: ParseValue | null;
@@ -12,12 +13,14 @@ interface WireframeProps {
 const Item = ({item}: {item: ParseItem}) => {
     const {Button, Field, Image, Header, value, literal} = item.children;
 
+    const {state} = useContext(wireframeContext);
+    const {toNominativeCase} = state.nlp || {};
 
     let textEl = value || literal;
     let text = undefined;
     if(value && value[0].children.NaturalLiteral) {
         const {NaturalLiteral} = value[0].children;
-        text = NaturalLiteral[0].image
+        text = toNominativeCase ? toNominativeCase(NaturalLiteral[0].image) : NaturalLiteral[0].image
     } else if(textEl) {
         const {StringLiteral, Variable} = textEl[0].children;
         if(StringLiteral)

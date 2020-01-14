@@ -1,13 +1,21 @@
-import React, {render, useCallback, useState, createContext} from 'preact/compat';
+import React, {render, useCallback, useState, useEffect, useContext} from 'preact/compat';
 import {Wireframe} from "imagineui-core/src/wireframe";
-import {SceneDescription} from "imagineui-core/src/types/logic";
 import {parseSceneToAST, ParseValue} from "imagineui-core/src/parse/ast";
 import './index.css';
 import {Editor} from "./editor";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import {MarkerSeverity} from "monaco-editor";
+import {StateProvider, WireframeActionTypes, wireframeContext} from "imagineui-core/src/nlp/nlp-store";
+import {initRussianNLP} from "imagineui-core/src/nlp/nlp-ru_RU";
 
 const Playground = () => {
+    const { dispatch } = useContext(wireframeContext)
+    useEffect(() => {
+        initRussianNLP().then(nlp => {
+            dispatch({type: WireframeActionTypes.SET_NLP, nlp})
+        }).catch(console.error)
+    }, [dispatch])
+
     const [sceneAST, setSceneAST] = useState<ParseValue | null>(null)
     const onChange = useCallback((ev: monaco.editor.IModelContentChangedEvent, editor: monaco.editor.IStandaloneCodeEditor) => {
         // TODO: Consider incremental compilation with ev.changes to speed up the parsing/rendering
@@ -55,4 +63,4 @@ const Playground = () => {
     </div>
 }
 
-render(<Playground/>, document.getElementById('root')!);
+render(<StateProvider><Playground/></StateProvider>, document.getElementById('root')!);

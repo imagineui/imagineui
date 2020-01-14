@@ -1,21 +1,5 @@
-import * as fs from 'fs';
-import yaml from 'js-yaml';
-import {SceneDescription} from '../types/logic';
 import {SceneLexer, SceneParser} from "./grammar";
 import {ILexingError, IRecognitionException, IToken} from "chevrotain";
-
-// TODO: Implement scene parser
-export function describeSceneFromAST(inputPath: string): SceneDescription {
-    return yaml.safeLoad(fs.readFileSync(inputPath, 'utf8'));
-}
-
-export function parseSceneFromText(sceneText: string): SceneDescription {
-    return {
-        key: sceneText,
-        areas: [],
-        connectedScenes: []
-    }
-}
 
 interface ParseText {
     children: {
