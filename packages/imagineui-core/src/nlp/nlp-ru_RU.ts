@@ -1,11 +1,11 @@
-// @ts-ignore
-import {Az} from 'az';
-import {NLProcessor} from "./nlp-store";
+// @ts-ignore  fixme: typings for Az and consistent API between forks
+import {default as Az} from 'az';
+import {NLProcessor} from "../store";
 
-function initAz() {
+function initAz(dictPath: string) {
     return new Promise(((resolve, reject) => {
         try {
-            Az.Morph.init('https://unpkg.com/az@0.2.3/dicts', resolve)
+            Az.Morph.init(dictPath, resolve)
         } catch (e) {
             reject(e)
         }
@@ -16,8 +16,8 @@ const conjunctions = ['или', 'и']
 const prepositions = ['с', 'для']
 const cases = ['gent', 'ablt']
 
-export async function initRussianNLP(): Promise<NLProcessor> {
-    await initAz()
+export async function initRussianNLP(dictPath: string = 'https://unpkg.com/az@0.2.3/dicts'): Promise<NLProcessor> {
+    await initAz(dictPath)
     return {
         locale: 'ru_RU',
         toNominativeCase(phrase: string): string {

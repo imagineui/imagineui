@@ -1,11 +1,12 @@
 import React, {render, useCallback, useState, useEffect, useContext} from 'preact/compat';
 import {Wireframe} from "imagineui-core/src/wireframe";
 import {parseSceneToAST, ParseValue} from "imagineui-core/src/parse/ast";
+import 'wired-elements';
 import './index.css';
 import {Editor} from "./editor";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import {MarkerSeverity} from "monaco-editor";
-import {StateProvider, WireframeActionTypes, wireframeContext} from "imagineui-core/src/nlp/nlp-store";
+import {StateProvider, WireframeActionTypes, wireframeContext} from "imagineui-core/src/store";
 import {initRussianNLP} from "imagineui-core/src/nlp/nlp-ru_RU";
 import {IToken} from "chevrotain";
 

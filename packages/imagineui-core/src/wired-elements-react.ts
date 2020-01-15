@@ -1,5 +1,4 @@
 import * as React from "preact/compat";
-import 'wired-elements';
 import {ClassAttributes, ComponentChildren} from "preact";
 
 /**

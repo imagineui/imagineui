@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "./node_modules/ts-node/dist/bin.js packages/imagineui-cli/src/app.ts",
+    "start": "yarn workspace imagineui-cli start",
     "dev-web": "yarn workspace imagineui-web start",
     "test": "test"
   },

@@ -1,19 +1,19 @@
 import React, {createContext, useCallback, useContext} from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
 import {ParseBlock, ParseItem, ParseList, ParsePage, ParseValue} from "./parse/ast";
-import {wireframeContext} from "./nlp/nlp-store";
+import {wireframeContext} from "./store";
 import {IToken} from "chevrotain";
 
 interface WireframeProps {
     sceneDescription: ParseValue | null;
-    className: string;
+    className?: string;
     onHover?: (tokens: IToken[]) => void;
 }
 
 const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) => void}) => {
     const {Button, Field, Image, Header, value, literal} = item.children;
 
-    const {state} = useContext(wireframeContext);
+    const {state} = useContext(wireframeContext!);
     const {toNominativeCase} = state.nlp || {};
 
     let textEl = value || literal;

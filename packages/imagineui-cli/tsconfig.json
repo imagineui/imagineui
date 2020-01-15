@@ -1,26 +1,32 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es6",
+    "module": "commonjs",
     "lib": [
-      "esnext"
+      "es2018",
+      "esnext.array"
     ],
     "jsx": "react",
     "allowJs": true,
-    "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
     "isolatedModules": false,
     "outDir": "dist",
+    "noEmit": true,
     "preserveSymlinks": true,
     "composite": true
   },
   "include": [
-    "src"
+    "src",
+    "../../node_modules/wired-elements",
+    "../imagineui-core/*",
+    "../imagineui-core/*.ts",
+    "../imagineui-core/*.tsx",
+    "../imagineui-core"
   ]
 }
