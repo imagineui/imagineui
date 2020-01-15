@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "start": "yarn workspace imagineui-cli start",
+    "imagineui": "yarn workspace imagineui-cli start",
     "dev-web": "yarn workspace imagineui-web start",
     "test": "test"
   },
