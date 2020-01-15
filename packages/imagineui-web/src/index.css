@@ -17,3 +17,19 @@
 }
 
 .wireframe { grid-area: wireframe; display: flex; flex-direction: column; align-items: center;}
+
+.token {
+    background-color: #00000033;
+}
+
+.token__NaturalLiteral {
+    background-color: rgba(237, 238, 59, 0.2);
+}
+
+.token__StringLiteral {
+    background-color: rgba(0, 104, 19, 0.2);
+}
+
+.token__Variable {
+    background-color: rgba(49, 255, 250, 0.2);
+}

@@ -1,16 +1,16 @@
-import React, {createContext, useContext} from "preact/compat";
+import React, {createContext, useCallback, useContext} from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
 import {ParseBlock, ParseItem, ParseList, ParsePage, ParseValue} from "./parse/ast";
 import {wireframeContext} from "./nlp/nlp-store";
+import {IToken} from "chevrotain";
 
 interface WireframeProps {
     sceneDescription: ParseValue | null;
     className: string;
+    onHover?: (tokens: IToken[]) => void;
 }
 
-// <WiredInput placeholder="Placeholder"/>
-
-const Item = ({item}: {item: ParseItem}) => {
+const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) => void}) => {
     const {Button, Field, Image, Header, value, literal} = item.children;
 
     const {state} = useContext(wireframeContext);
@@ -29,20 +29,34 @@ const Item = ({item}: {item: ParseItem}) => {
             text = '[WIP] Подстановки переменных'
     }
 
+    const onMouseEnter = useCallback(() => {
+        const valueTokens = textEl ? Object.values(textEl[0].children).flat() : []
+        const classTokens = [Button, Field, Image, Header].flat().filter(token => !!token)
+        onHover && onHover([...classTokens, ...valueTokens])
+    }, [value, onHover])
+
+    const onMouseLeave = useCallback(() => {
+        onHover && onHover([])
+    }, [onHover])
+
+    const elProps = {
+        onMouseEnter, onMouseLeave
+    }
+
     if(Button) {
-        return <WiredButton>{text || Button[0].image}</WiredButton>
+        return <WiredButton {...elProps}>{text || Button[0].image}</WiredButton>
     }
 
     if(Field) {
-        return <WiredInput placeholder={text || Field[0].image}></WiredInput>
+        return <WiredInput {...elProps} placeholder={text || Field[0].image}></WiredInput>
     }
 
     if(Header) {
-        return <h1>{text || Header[0].image}</h1>
+        return <h1 {...elProps}>{text || Header[0].image}</h1>
     }
 
     if(Image) {
-        return <WiredCard fill="beige" elevation={2}>
+        return <WiredCard fill="beige" elevation={2} {...elProps}>
             <div style={{width: 150, height: 150, textAlign: 'center', verticalAlign: 'center',
                 display: 'flex',
                 alignItems: 'center',
@@ -53,7 +67,7 @@ const Item = ({item}: {item: ParseItem}) => {
     }
 
     if(literal) {
-        return <div>
+        return <div {...elProps}>
             {text}
         </div>
     }
@@ -61,37 +75,37 @@ const Item = ({item}: {item: ParseItem}) => {
     return null;
 }
 
-const List = ({list}: {list: ParseList}) => {
+const List = ({list, onHover}: {list: ParseList, onHover?: (tokens: IToken[]) => void}) => {
     if(list.children.item) {
         return <>
-            {list.children.item.map(item => <Item item={item}/>)}
+            {list.children.item.map(item => <Item item={item} onHover={onHover}/>)}
         </>
     }
 
     return <div>{list.children.List[0].image}</div>
 }
 
-const Block = ({block}: {block: ParseBlock}) => {
+const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]) => void}) => {
     return <>
-        {block.children.item && block.children.item.map(item => <Item item={item}/>)}
+        {block.children.item && block.children.item.map(item => <Item item={item} onHover={onHover}/>)}
         {block.children.list && block.children.list.map(list => <>
-            <WiredCard><List list={list}/></WiredCard>
-            <WiredCard><List list={list}/></WiredCard>
-            <WiredCard><List list={list}/></WiredCard>
+            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
+            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
+            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
         </> )}
     </>
 }
-const Page = ({page}: {page: ParsePage}) => <>{
+const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => <>{
         page.children.block.map((block,i) => <>
-            <Block block={block}/>
+            <Block block={block} onHover={onHover}/>
             {i !== page.children.block.length - 1 ? <WiredDivider/> : null}
         </>)
     }</>
 
-export const Wireframe = ({sceneDescription, className}: WireframeProps) => {
+export const Wireframe = ({sceneDescription, className, onHover}: WireframeProps) => {
     return <div className={className}>
         {sceneDescription && sceneDescription.children.page.map((page, i) => <>
-            <Page page={page}/>
+            <Page page={page} onHover={onHover}/>
             {/*{i !== page.children.block.length - 1 ? <WiredDivider elevation={4}/> : null}*/}
         </>)}
     </div>
