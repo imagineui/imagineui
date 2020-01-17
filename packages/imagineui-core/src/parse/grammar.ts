@@ -4,34 +4,91 @@ import {Rule} from "chevrotain";
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
 
-const PAGE = /(\s+[Сс]траница:|[Сс]траница:|\s+[Ээ]кран:|[Ээ]кран:)/
-const BLOCK = /(\s+[Бб]лок:|[Бб]лок:)/
-const EXAMPLE = /(\s+[Пп]римеры:|[Пп]римеры:)/
-const MAIN = /(\s+[Гг]лавный\s|[Гг]лавный\s)/
-const HEADER = /(\s+[Зз]аголовок|[Зз]аголовок)/
-const FIELD = /(\s+[Пп]оле ввода\s?|[Пп]оле ввода|\s+[Пп]оле|[Пп]оле)/
-const BUTTON = /(\s+[Кк]нопка|[Кк]нопка|\s+[Сс]ылка|[Сс]ылка)/
-const LIST = /(\s+[Сс]писок|[Сс]писок)/
-const IMAGE = /(\s+[Кк]артинка|[Кк]артинка)/
-const CONSISTS_OF = /(включает в себя)/
-const ALIGNED = /(расположены по)/
-const WITH_ICON = /(с иконкой)/
-//const KEYWORDS = /$${__PAGE} | $${__BLOCK} | $${__MAIN} | $${__HEADER} | $${__FIELD} | $${__BUTTON} | $${__LIST} | $${__IMAGE} | $${__CONSISTS_OF} | $${__ALIGNED} | $${__EXAMPLE} | $${__WITH_ICON}__VARIABLE \= (\$<.+>)/
+interface KeywordDictionary {
+    page: string[];
+    block: string[];
+    example: string[];
+    main: string[];
 
-const Page = createToken({name: "Page", pattern: PAGE});
-const Block = createToken({name: "Block", pattern: BLOCK});
-const Example = createToken({name: "Example", pattern: EXAMPLE});
-const Main = createToken({name: "Main", pattern: MAIN});
-const Field = createToken({name: "Field", pattern: FIELD});
-const Button = createToken({name: "Button", pattern: BUTTON});
-const Header = createToken({name: "Header", pattern: HEADER});
-const List = createToken({name: "List", pattern: LIST});
-const Image = createToken({name: "Image", pattern: IMAGE});
-const Aligned = createToken({name: "Aligned", pattern: ALIGNED});
-const WithIcon = createToken({name: "WithIcon", pattern: WITH_ICON});
-const ConsistsOf = createToken({name: "ConsistsOf", pattern: CONSISTS_OF});
-const Comma = createToken({name: "Comma", pattern: /,/});
-const Colon = createToken({name: "Colon", pattern: /:/});
+    header: string[];
+    field: string[];
+    button: string[];
+    list: string[];
+    image: string[];
+
+    consists_of: string[];
+    with_icon: string[];
+
+    aligned: string[];
+}
+
+const ru_RUKeywords: KeywordDictionary = {
+    page: ['страница:', 'экран:'],
+    block: ['блок:'],
+    example: ['примеры:'],
+    main: ['главный'],
+
+    header: ['заголовок'],
+    field: ['поле ввода','поле'],
+    button: ['кнопка','ссылка'],
+    list: ['список'],
+    image: ['картинка'],
+
+    consists_of: ['включает в себя'],
+    aligned: ['расположены'],
+    with_icon: ['с иконкой'],
+}
+
+const buildPatternFromWord = (word: string) => {
+    const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`
+    const wordMatch = `${caseInsensitive}${word.substring(1)}`
+    return `\s+${wordMatch}|${wordMatch}`
+}
+
+const buildRegexFromWords = (words: string[]) =>
+    new RegExp(words.map(buildPatternFromWord).join('|'))
+
+const buildTokenSet = (dict: KeywordDictionary) => {
+    const toRegex = buildRegexFromWords
+
+    return {
+        Page: createToken({name: "Page", pattern: toRegex(dict.page)}),
+        Block: createToken({name: "Block", pattern: toRegex(dict.block)}),
+        Example: createToken({name: "Example", pattern: toRegex(dict.example)}),
+        Main: createToken({name: "Main", pattern: toRegex(dict.main)}),
+        Field: createToken({name: "Field", pattern: toRegex(dict.field)}),
+        Button: createToken({name: "Button", pattern: toRegex(dict.button)}),
+        Header: createToken({name: "Header", pattern: toRegex(dict.header)}),
+        List: createToken({name: "List", pattern: toRegex(dict.list)}),
+        Image: createToken({name: "Image", pattern: toRegex(dict.image)}),
+        WithIcon: createToken({name: "WithIcon", pattern: toRegex(dict.with_icon)}),
+        ConsistsOf: createToken({name: "ConsistsOf", pattern: toRegex(dict.consists_of)}),
+        Aligned: createToken({name: "Aligned", pattern: toRegex(dict.aligned)}),
+        Comma: createToken({name: "Comma", pattern: /,/}),
+        Colon: createToken({name: "Colon", pattern: /:/}),
+    }
+}
+
+const TokenSet = buildTokenSet(ru_RUKeywords)
+
+const {
+    Page,
+    Block,
+    Example,
+    Main,
+    Field,
+    Button,
+    Header,
+    List,
+    Image,
+    Aligned,
+    WithIcon,
+    ConsistsOf,
+    Comma,
+    Colon
+} = TokenSet;
+
+export const KEYWORDS = Object.values(TokenSet).map(token => token.PATTERN);
 
 const Comment = createToken({
     name: 'Comment',

@@ -3,6 +3,7 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
+import {KEYWORDS} from "imagineui-core/src/parse/grammar";
 
 // const onigasmWasm = require('onigasm/lib/onigasm.wasm') TODO: Webpack WASM Loader https://github.com/webpack/webpack/issues/7352
 // const syntax = require('./scene_syntax.xml') TODO: Fix raw file loader
@@ -37,7 +38,7 @@ const syntax = `
                 <array>
                     <dict>
                         <key>match</key>
-                        <string>(\\s+[\\x{0421}\\x{0441}]траница:|[\\x{0421}\\x{0441}]траница:|\\s+[\\x{042d}\\x{044d}]кран:|[\\x{042d}\\x{044d}]кран:)|(\\s+[\\x{0411}\\x{0431}]лок:|[\\x{0411}\\x{0431}]лок:)|(\\s+[\\x{0413}\\x{0433}]лавный\\s|[\\x{0413}\\x{0433}]лавный\\s)|(^\\s+[\\x{0417}\\x{0437}]аголовок|^[\\x{0417}\\x{0437}]аголовок)|(^\\s+[\\x{041f}\\x{043f}]оле ввода\\s?|^[\\x{041f}\\x{043f}]оле ввода|^\\s+[\\x{041f}\\x{043f}]оле|^[\\x{041f}\\x{043f}]оле)|(^\\s+[\\x{041a}\\x{043a}]нопка|^[\\x{041a}\\x{043a}]нопка|^\\s+[\\x{0421}\\x{0441}]ылка|^[\\x{0421}\\x{0441}]ылка)|(^\\s+[\\x{0421}\\x{0441}]писок|^[\\x{0421}\\x{0441}]писок)|(^\\s+[\\x{041a}\\x{043a}]артинка|^[\\x{041a}\\x{043a}]артинка)|(включает в себя)|(расположены по)|(\\s+[\\x{041f}\\x{043f}]римеры:|[\\x{041f}\\x{043f}]римеры:)|(с иконкой)</string>
+                        <string>${KEYWORDS.map(regex => regex.source).join('|')}</string>
                         <key>name</key>
                         <string>keyword.imagineui_scene</string>
                     </dict>
