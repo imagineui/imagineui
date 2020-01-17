@@ -1,6 +1,6 @@
 import React, {createContext, useCallback, useContext} from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
-import {ParseBlock, ParseItem, ParseList, ParsePage, ParseValue} from "./parse/ast";
+import {ParseBlock, ParseColumn, ParseItem, ParseList, ParsePage, ParseRow, ParseValue} from "./parse/ast";
 import {wireframeContext} from "./store";
 import {IToken} from "chevrotain";
 
@@ -67,7 +67,7 @@ const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) =>
     }
 
     if(literal) {
-        return <div {...elProps}>
+        return <div {...elProps} style={{margin: 8}}>
             {text}
         </div>
     }
@@ -85,22 +85,50 @@ const List = ({list, onHover}: {list: ParseList, onHover?: (tokens: IToken[]) =>
     return <div>{list.children.List[0].image}</div>
 }
 
+const getSubblockToken = (subblock: ParseRow | ParseColumn) => {
+    if(subblock.name === 'row') {
+        return subblock.children.Row[0]
+    } else {
+        return subblock.children.Column[0]
+    }
+}
+
 const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]) => void}) => {
-    return <>
-        {block.children.item && block.children.item.map(item => <Item item={item} onHover={onHover}/>)}
-        {block.children.list && block.children.list.map(list => <>
+    const {row, column, item, list} = block.children;
+
+    const subblocks = [...(row || []), ...(column || [])]
+        .sort((a, b) => (
+            getSubblockToken(a).startOffset - getSubblockToken(b).startOffset
+        ))
+
+    // TODO: [tests] Validate that blocks are column-directed by default
+    subblocks.unshift({
+        children: {
+            Column: block.children.Block,
+            item,
+            list
+        },
+        name: 'column'
+    })
+
+    if(subblocks.length === 0)
+        return null;
+
+    return subblocks.map(subblock => <div style={{display: 'flex', flexDirection: subblock.name}}>
+        {subblock.children.item && subblock.children.item.map(item => <Item item={item} onHover={onHover}/>)}
+        {subblock.children.list && subblock.children.list.map(list => <>
             <WiredCard><List list={list} onHover={onHover}/></WiredCard>
             <WiredCard><List list={list} onHover={onHover}/></WiredCard>
             <WiredCard><List list={list} onHover={onHover}/></WiredCard>
         </> )}
-    </>
+    </div>)
 }
-const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => <>{
+const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => page.children.block ? <>{
         page.children.block.map((block,i) => <>
             <Block block={block} onHover={onHover}/>
             {i !== page.children.block.length - 1 ? <WiredDivider/> : null}
         </>)
-    }</>
+    }</> : null;
 
 export const Wireframe = ({sceneDescription, className, onHover}: WireframeProps) => {
     return <div className={className}>

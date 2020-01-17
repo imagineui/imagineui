@@ -20,6 +20,8 @@ interface KeywordDictionary {
     with_icon: string[];
 
     aligned: string[];
+    row: string[];
+    column: string[];
 }
 
 const ru_RUKeywords: KeywordDictionary = {
@@ -37,6 +39,8 @@ const ru_RUKeywords: KeywordDictionary = {
     consists_of: ['включает в себя'],
     aligned: ['расположены'],
     with_icon: ['с иконкой'],
+    row: ['в строку', 'в одну строку', 'в строчку'],
+    column: ['в столбец'],
 }
 
 const buildPatternFromWord = (word: string) => {
@@ -64,10 +68,16 @@ const buildTokenSet = (dict: KeywordDictionary) => {
         WithIcon: createToken({name: "WithIcon", pattern: toRegex(dict.with_icon)}),
         ConsistsOf: createToken({name: "ConsistsOf", pattern: toRegex(dict.consists_of)}),
         Aligned: createToken({name: "Aligned", pattern: toRegex(dict.aligned)}),
+        Row: createToken({name: "Row", pattern: toRegex(dict.row)}),
+        Column: createToken({name: "Column", pattern: toRegex(dict.column)}),
         Comma: createToken({name: "Comma", pattern: /,/}),
         Colon: createToken({name: "Colon", pattern: /:/}),
     }
 }
+
+const CONSISTS_OF = /(включает в себя)/
+const ALIGNED = /(расположены по)/
+const WITH_ICON = /(с иконкой)/
 
 const TokenSet = buildTokenSet(ru_RUKeywords)
 
@@ -84,11 +94,13 @@ const {
     Aligned,
     WithIcon,
     ConsistsOf,
+    Row,
+    Column,
     Comma,
     Colon
 } = TokenSet;
 
-export const KEYWORDS = Object.values(TokenSet).map(token => token.PATTERN);
+export const KEYWORDS_PATTERN = Object.values(ru_RUKeywords).map(buildRegexFromWords).map(regex => regex.source).join('|')
 
 const Comment = createToken({
     name: 'Comment',
@@ -122,7 +134,7 @@ const WhiteSpace = createToken({
 });
 
 const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, Page, Block,
-    Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, WithIcon, ConsistsOf, NaturalLiteral];
+    Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Row, Column, WithIcon, ConsistsOf, NaturalLiteral];
 
 export const SceneLexer = new Lexer(sceneTokens, {
     // Less position info tracked, reduces verbosity of the playground output.
@@ -145,6 +157,8 @@ export class SceneParser extends Parser {
     readonly scene!: () => any;
     readonly page!: (idx: number) => any;
     readonly block!: (idx: number) => any;
+    readonly row!: (idx: number) => any;
+    readonly column!: (idx: number) => any;
     readonly example!: (idx: number) => any;
     readonly exampleitem!: (idx: number) => any;
     readonly item!: (idx: number) => any;
@@ -190,11 +204,39 @@ export class SceneParser extends Parser {
             $.CONSUME(Block);
             $.SUBRULE($.value);
             $.CONSUME(LineEnd);
+            $.MANY1(() => {
+                $.OR1([
+                    {ALT: () => $.SUBRULE($.item)},
+                    {ALT: () => $.SUBRULE($.list)}
+                ])
+            });
+            $.MANY2(() => {
+                $.OR2([
+                    {ALT: () => $.SUBRULE($.row)},
+                    {ALT: () => $.SUBRULE($.column)}
+                    ])
+            });
+        });
+
+        $.RULE("row", () => {
+            $.CONSUME(Row);
+            $.CONSUME(LineEnd);
             $.MANY(() => {
                 $.OR([
                     {ALT: () => $.SUBRULE($.item)},
                     {ALT: () => $.SUBRULE($.list)}
-                    ])
+                ])
+            });
+        });
+
+        $.RULE("column", () => {
+            $.CONSUME(Column);
+            $.CONSUME(LineEnd);
+            $.MANY(() => {
+                $.OR([
+                    {ALT: () => $.SUBRULE($.item)},
+                    {ALT: () => $.SUBRULE($.list)}
+                ])
             });
         });
 

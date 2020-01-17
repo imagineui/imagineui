@@ -30,6 +30,24 @@ export interface ParseItem {
     name: 'item'
 }
 
+export interface ParseColumn {
+    children: {
+        Column: [IToken]
+        item?: ParseItem[]
+        list?: ParseList[]
+    }
+    name: 'column'
+}
+
+export interface ParseRow {
+    children: {
+        Row: [IToken]
+        item?: ParseItem[]
+        list?: ParseList[]
+    }
+    name: 'row'
+}
+
 export interface ParseBlock {
     children: {
         Main?: [IToken],
@@ -37,6 +55,8 @@ export interface ParseBlock {
         value: ParseTextValue[]
         item?: ParseItem[]
         list?: ParseList[]
+        row?: ParseRow[]
+        column?: ParseColumn[]
     }
     name: 'block'
 }
@@ -53,7 +73,7 @@ export interface ParsePage {
     children: {
         Page: [IToken],
         value: IToken[],
-        block: ParseBlock[]
+        block?: ParseBlock[]
         list: ParseList[]
     }
     name: 'page'

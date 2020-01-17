@@ -3,7 +3,7 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import {KEYWORDS} from "imagineui-core/src/parse/grammar";
+import {KEYWORDS_PATTERN} from "imagineui-core/src/parse/grammar";
 
 // const onigasmWasm = require('onigasm/lib/onigasm.wasm') TODO: Webpack WASM Loader https://github.com/webpack/webpack/issues/7352
 // const syntax = require('./scene_syntax.xml') TODO: Fix raw file loader
@@ -38,7 +38,7 @@ const syntax = `
                 <array>
                     <dict>
                         <key>match</key>
-                        <string>${KEYWORDS.map(regex => regex.source).join('|')}</string>
+                        <string>${KEYWORDS_PATTERN}</string>
                         <key>name</key>
                         <string>keyword.imagineui_scene</string>
                     </dict>
@@ -146,17 +146,18 @@ const loginContent =
     Поле ввода пароля
     Кнопка "Войти"
 Блок: Сервис
+    В строку
     Кнопка восстановления доступа
     Кнопка регистрации
     "2020 @vadkou"
 Блок: Справка
+    В столбец
     Список тем
         включает в себя
             Заголовок
             <Ссылку на статью>
 
-    
-// Блоки расположены по вертикали // Сетка пока в разработке
+
 
 // Схема на русском языке для демонстрации заложенной возможности 
 // локализованных вариаций языка по типу Gherkin
