@@ -137,7 +137,7 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
             })
 
             // TODO: [perf] Make a better
-            return <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'column' : 'row'}}>
+            return <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
                 {Array(num).fill(0).map((_, i) => <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'row' : 'column'}}>
                     {items.filter((value, index) => index % num == i)}
                 </div>)}
@@ -145,12 +145,36 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
         })}
     </>
 }
-const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => page.children.block ? <>{
-        page.children.block.map((block,i) => <>
-            <Block block={block} onHover={onHover}/>
-            {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
-        </>)
-    }</> : null;
+
+const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => {
+
+    const {Mobile, Tablet, Widescreen} = page.children;
+
+    const blocks = page.children.block
+            ? page.children.block.map((block,i) => <>
+                <Block block={block} onHover={onHover}/>
+                {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
+            </>)
+            : null
+
+    // TODO: [guide] Guidelines should be in
+    let width = 0;
+    if(Mobile) width = 320;
+    if(Tablet) width = 640;
+    if(Widescreen) width = 960;
+
+    if(width) {
+        return <WiredCard>
+            <div style={{width, overflow: 'hidden', alignItems: 'center'}}>
+                {blocks}
+            </div>
+        </WiredCard>
+    } else {
+        return <>
+            {blocks}
+        </>
+    }
+}
 
 export const Wireframe = ({sceneDescription, className, onHover}: WireframeProps) => {
     return <div className={className}>

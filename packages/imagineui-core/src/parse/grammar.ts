@@ -26,6 +26,11 @@ interface NumericDictionary {
 
 interface KeywordDictionary {
     page: string[];
+    mobile: string[];
+    tablet: string[];
+    widescreen: string[];
+    with_scroll: string[];
+
     block: string[];
     example: string[];
     main: string[];
@@ -63,6 +68,11 @@ const ru_RUNumbers: NumericDictionary = {
 // TODO: [perf] Pre-bake patterns with all necessary inflections with a compile-time script
 const ru_RUKeywords: KeywordDictionary = {
     page: ['страница:', 'экран:'],
+    mobile: ['мобильный', 'мобильная'],
+    tablet: ['планшетный', 'планшетная', 'ноутбучный', 'ноутбучная'],
+    widescreen: ['широкоформатный', 'широкоформатная'],
+    with_scroll: ['с прокруткой'],
+
     block: ['блок:'],
     example: ['примеры:'],
     main: ['главный'],
@@ -95,6 +105,9 @@ const buildTokenSet = (dict: KeywordDictionary) => {
 
     return {
         Page: createToken({name: "Page", pattern: toRegex(dict.page)}),
+        Mobile: createToken({name: "Mobile", pattern: toRegex(dict.mobile)}),
+        Tablet: createToken({name: "Tablet", pattern: toRegex(dict.tablet)}),
+        Widescreen: createToken({name: "Widescreen", pattern: toRegex(dict.widescreen)}),
         Block: createToken({name: "Block", pattern: toRegex(dict.block)}),
         Example: createToken({name: "Example", pattern: toRegex(dict.example)}),
         Main: createToken({name: "Main", pattern: toRegex(dict.main)}),
@@ -143,6 +156,9 @@ const NumericTokenSet = buildNumsSet(ru_RUNumbers)
 
 const {
     Page,
+    Mobile,
+    Tablet,
+    Widescreen,
     Block,
     Example,
     Main,
@@ -210,7 +226,9 @@ const WhiteSpace = createToken({
     group: Lexer.SKIPPED
 });
 
-const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, Page, Block,
+const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
+    Page, Mobile, Tablet, Widescreen,
+    Block,
     Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
     ...Object.values(NumericTokenSet),
     NaturalLiteral];
@@ -268,12 +286,19 @@ export class SceneParser extends Parser {
         });
 
         $.RULE("page", () => {
+            $.OPTION(() => {
+                $.OR1([
+                    {ALT: () => $.CONSUME(Mobile)},
+                    {ALT: () => $.CONSUME(Tablet)},
+                    {ALT: () => $.CONSUME(Widescreen)}
+                ]);
+            });
             $.CONSUME(Page);
             // $.CONSUME(WhiteSpace);
             $.SUBRULE($.value);
             $.CONSUME(LineEnd);
             $.MANY(() => {
-                $.OR([
+                $.OR2([
                     {ALT: () => $.SUBRULE($.block)},
                     {ALT: () => $.SUBRULE($.example)}
                 ]);

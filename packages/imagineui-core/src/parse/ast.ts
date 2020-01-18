@@ -117,6 +117,9 @@ export interface ParseList {
 
 export interface ParsePage {
     children: {
+        Mobile?: [IToken],
+        Tablet?: [IToken],
+        Widescreen?: [IToken],
         Page: [IToken],
         value: IToken[],
         block?: ParseBlock[]
