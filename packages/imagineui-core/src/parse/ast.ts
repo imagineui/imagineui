@@ -9,6 +9,48 @@ interface ParseText {
     name: 'text'
 }
 
+interface ParseNumber {
+    children: {
+        NumberLiteral?: [IToken]
+        Zero?: [IToken]
+        One?: [IToken]
+        Two?: [IToken]
+        Three?: [IToken]
+        Four?: [IToken]
+        Five?: [IToken]
+        Six?: [IToken]
+        Seven?: [IToken]
+        Eight?: [IToken]
+        Nine?: [IToken]
+        Ten?: [IToken]
+        Eleven?: [IToken]
+        Twelve?: [IToken]
+    }
+    name: 'number'
+}
+
+export const numberTokenToNumber = ({children}: ParseNumber) => {
+    if(children.NumberLiteral) {
+        return parseFloat(children.NumberLiteral[0].image)
+    }
+
+    if(children.Zero) return 0;
+    if(children.One) return 1;
+    if(children.Two) return 2;
+    if(children.Three) return 3;
+    if(children.Four) return 4;
+    if(children.Five) return 5;
+    if(children.Six) return 6;
+    if(children.Seven) return 7;
+    if(children.Eight) return 8;
+    if(children.Nine) return 9;
+    if(children.Ten) return 10;
+    if(children.Eleven) return 11;
+    if(children.Twelve) return 12;
+
+    throw new Error('Parsed number has no tokens')
+}
+
 interface ParseTextValue {
     children: {
         NaturalLiteral: [IToken]
@@ -30,22 +72,26 @@ export interface ParseItem {
     name: 'item'
 }
 
-export interface ParseColumn {
+export interface ParseColumns {
     children: {
-        Column: [IToken]
+        In: [IToken]
+        number?: [ParseNumber]
+        Columns: [IToken]
         item?: ParseItem[]
         list?: ParseList[]
     }
-    name: 'column'
+    name: 'columns'
 }
 
-export interface ParseRow {
+export interface ParseRows {
     children: {
-        Row: [IToken]
+        In: [IToken]
+        number?: [ParseNumber]
+        Rows: [IToken]
         item?: ParseItem[]
         list?: ParseList[]
     }
-    name: 'row'
+    name: 'rows'
 }
 
 export interface ParseBlock {
@@ -55,8 +101,8 @@ export interface ParseBlock {
         value: ParseTextValue[]
         item?: ParseItem[]
         list?: ParseList[]
-        row?: ParseRow[]
-        column?: ParseColumn[]
+        rows?: ParseRows[]
+        columns?: ParseColumns[]
     }
     name: 'block'
 }

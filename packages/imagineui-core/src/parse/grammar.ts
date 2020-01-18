@@ -4,6 +4,26 @@ import {Rule} from "chevrotain";
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
 
+/**
+ * Natural language numerics are limited to a 12-column system
+ * TODO: Consider parsing all numerals
+ */
+interface NumericDictionary {
+    zero: string[];
+    one: string[];
+    two: string[];
+    three: string[];
+    four: string[];
+    five: string[];
+    six: string[];
+    seven: string[];
+    eight: string[];
+    nine: string[];
+    ten: string[];
+    eleven: string[];
+    twelve: string[];
+}
+
 interface KeywordDictionary {
     page: string[];
     block: string[];
@@ -20,10 +40,27 @@ interface KeywordDictionary {
     with_icon: string[];
 
     aligned: string[];
-    row: string[];
-    column: string[];
+    // in: string[];
+    rows: string[];
+    columns: string[];
 }
 
+const ru_RUNumbers: NumericDictionary = {
+    zero: ['ноль','ноля','нолю'],
+    one: ['один', 'одна', 'одного', 'одну', 'одним', 'одной'],
+    two: ['два', 'две', 'двум','двумя'],
+    three: ['три','трём','тремя'],
+    four: ['четыре', 'четырём','четыремя'],
+    five: ['пять', 'пяти', 'пятью'],
+    six: ['шесть', 'шести','шестью'],
+    seven: ['семь', 'семи','семью'],
+    eight: ['восемь', 'восьми', 'восьмью'],
+    nine: ['девять', 'девяти', 'девятью'],
+    ten: ['десять', 'десяти', 'десятью'],
+    eleven: ['одиннадцать', 'одиннадцати', 'одиннадцатью'],
+    twelve: ['двенадцать', 'двенадцати', 'двенадцатью'],
+}
+// TODO: [perf] Pre-bake patterns with all necessary inflections with a compile-time script
 const ru_RUKeywords: KeywordDictionary = {
     page: ['страница:', 'экран:'],
     block: ['блок:'],
@@ -38,14 +75,15 @@ const ru_RUKeywords: KeywordDictionary = {
 
     consists_of: ['включает в себя'],
     aligned: ['расположены'],
+    // in: ['в'],
     with_icon: ['с иконкой'],
-    row: ['в строку', 'в одну строку', 'в строчку'],
-    column: ['в столбец'],
+    rows: ['строка', 'строку', 'строчка', 'строчку', 'строки', 'строк', 'строкой', 'строчкой', 'строками', 'строчками'],
+    columns: ['столбец', 'столбца', 'столбцов', 'столбцом'], // TODO: [lint] Auto-correction for plural inflections
 }
 
 const buildPatternFromWord = (word: string) => {
     const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`
-    const wordMatch = `${caseInsensitive}${word.substring(1)}`
+    const wordMatch = `${caseInsensitive}${word.substring(1).replace('ё', '[её]')}`
     return `\s+${wordMatch}|${wordMatch}`
 }
 
@@ -68,10 +106,31 @@ const buildTokenSet = (dict: KeywordDictionary) => {
         WithIcon: createToken({name: "WithIcon", pattern: toRegex(dict.with_icon)}),
         ConsistsOf: createToken({name: "ConsistsOf", pattern: toRegex(dict.consists_of)}),
         Aligned: createToken({name: "Aligned", pattern: toRegex(dict.aligned)}),
-        Row: createToken({name: "Row", pattern: toRegex(dict.row)}),
-        Column: createToken({name: "Column", pattern: toRegex(dict.column)}),
+        // In: createToken({name: "In", pattern: toRegex(dict.in)}),
+        Rows: createToken({name: "Rows", pattern: toRegex(dict.rows)}),
+        Columns: createToken({name: "Columns", pattern: toRegex(dict.columns)}),
         Comma: createToken({name: "Comma", pattern: /,/}),
         Colon: createToken({name: "Colon", pattern: /:/}),
+    }
+}
+
+const buildNumsSet = (dict: NumericDictionary) => {
+    const toRegex = buildRegexFromWords
+
+    return {
+        Zero: createToken({name: "Zero", pattern: toRegex(dict.zero)}),
+        One: createToken({name: "One", pattern: toRegex(dict.one)}),
+        Two: createToken({name: "Two", pattern: toRegex(dict.two)}),
+        Three: createToken({name: "Three", pattern: toRegex(dict.three)}),
+        Four: createToken({name: "Four", pattern: toRegex(dict.four)}),
+        Five: createToken({name: "Five", pattern: toRegex(dict.five)}),
+        Six: createToken({name: "Six", pattern: toRegex(dict.six)}),
+        Seven: createToken({name: "Seven", pattern: toRegex(dict.seven)}),
+        Eight: createToken({name: "Eight", pattern: toRegex(dict.eight)}),
+        Nine: createToken({name: "Nine", pattern: toRegex(dict.nine)}),
+        Ten: createToken({name: "Ten", pattern: toRegex(dict.ten)}),
+        Eleven: createToken({name: "Eleven", pattern: toRegex(dict.eleven)}),
+        Twelve: createToken({name: "Twelve", pattern: toRegex(dict.twelve)}),
     }
 }
 
@@ -80,6 +139,7 @@ const ALIGNED = /(расположены по)/
 const WITH_ICON = /(с иконкой)/
 
 const TokenSet = buildTokenSet(ru_RUKeywords)
+const NumericTokenSet = buildNumsSet(ru_RUNumbers)
 
 const {
     Page,
@@ -94,11 +154,28 @@ const {
     Aligned,
     WithIcon,
     ConsistsOf,
-    Row,
-    Column,
+    // In,
+    Rows,
+    Columns,
     Comma,
     Colon
 } = TokenSet;
+
+const {
+    Zero,
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Eleven,
+    Twelve,
+} = NumericTokenSet;
 
 export const KEYWORDS_PATTERN = Object.values(ru_RUKeywords).map(buildRegexFromWords).map(regex => regex.source).join('|')
 
@@ -134,7 +211,9 @@ const WhiteSpace = createToken({
 });
 
 const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, Page, Block,
-    Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Row, Column, WithIcon, ConsistsOf, NaturalLiteral];
+    Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
+    ...Object.values(NumericTokenSet),
+    NaturalLiteral];
 
 export const SceneLexer = new Lexer(sceneTokens, {
     // Less position info tracked, reduces verbosity of the playground output.
@@ -153,12 +232,15 @@ Colon.LABEL = "':'";
 // ----------------- parser -----------------
 const Parser = chevrotain.Parser;
 
+// TODO: [conformity] Test if the parsed AST conforms to the TypeScript types or generate TS types from the rules
 export class SceneParser extends Parser {
     readonly scene!: () => any;
     readonly page!: (idx: number) => any;
     readonly block!: (idx: number) => any;
     readonly row!: (idx: number) => any;
     readonly column!: (idx: number) => any;
+    readonly rows!: (idx: number) => any;
+    readonly columns!: (idx: number) => any;
     readonly example!: (idx: number) => any;
     readonly exampleitem!: (idx: number) => any;
     readonly item!: (idx: number) => any;
@@ -166,6 +248,7 @@ export class SceneParser extends Parser {
     readonly list!: (idx: number) => any;
     readonly comment!: (idx: number) => any;
     readonly literal!: (idx: number) => any;
+    readonly number!: (idx: number) => any;
 
     constructor() {
         super(sceneTokens, {
@@ -212,14 +295,18 @@ export class SceneParser extends Parser {
             });
             $.MANY2(() => {
                 $.OR2([
-                    {ALT: () => $.SUBRULE($.row)},
-                    {ALT: () => $.SUBRULE($.column)}
+                    {ALT: () => $.SUBRULE($.rows)},
+                    {ALT: () => $.SUBRULE($.columns)},
                     ])
             });
         });
 
-        $.RULE("row", () => {
-            $.CONSUME(Row);
+        $.RULE("rows", () => {
+            // $.CONSUME(In);
+            $.OPTION(() => {
+                $.SUBRULE($.number);
+            });
+            $.CONSUME(Rows);
             $.CONSUME(LineEnd);
             $.MANY(() => {
                 $.OR([
@@ -229,8 +316,12 @@ export class SceneParser extends Parser {
             });
         });
 
-        $.RULE("column", () => {
-            $.CONSUME(Column);
+        $.RULE("columns", () => {
+            // $.CONSUME(In);
+            $.OPTION(() => {
+                $.SUBRULE($.number);
+            })
+            $.CONSUME(Columns);
             $.CONSUME(LineEnd);
             $.MANY(() => {
                 $.OR([
@@ -300,6 +391,25 @@ export class SceneParser extends Parser {
                 {ALT: () => $.CONSUME(Variable)},
             ]);
         });
+
+        $.RULE("number", () => {
+            $.OR([
+                {ALT: () => $.CONSUME(NumberLiteral)},
+                {ALT: () => $.CONSUME(Zero)},
+                {ALT: () => $.CONSUME(One)},
+                {ALT: () => $.CONSUME(Two)},
+                {ALT: () => $.CONSUME(Three)},
+                {ALT: () => $.CONSUME(Four)},
+                {ALT: () => $.CONSUME(Five)},
+                {ALT: () => $.CONSUME(Six)},
+                {ALT: () => $.CONSUME(Seven)},
+                {ALT: () => $.CONSUME(Eight)},
+                {ALT: () => $.CONSUME(Nine)},
+                {ALT: () => $.CONSUME(Ten)},
+                {ALT: () => $.CONSUME(Eleven)},
+                {ALT: () => $.CONSUME(Twelve)},
+            ]);
+        })
 
         $.RULE("value", () => {
             $.OR([

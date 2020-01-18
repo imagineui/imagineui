@@ -1,6 +1,15 @@
 import React, {createContext, useCallback, useContext} from "preact/compat";
 import {WiredButton, WiredInput, WiredDivider, WiredCard} from "./wired-elements-react";
-import {ParseBlock, ParseColumn, ParseItem, ParseList, ParsePage, ParseRow, ParseValue} from "./parse/ast";
+import {
+    numberTokenToNumber,
+    ParseBlock,
+    ParseColumns,
+    ParseItem,
+    ParseList,
+    ParsePage,
+    ParseRows,
+    ParseValue
+} from "./parse/ast";
 import {wireframeContext} from "./store";
 import {IToken} from "chevrotain";
 
@@ -85,18 +94,18 @@ const List = ({list, onHover}: {list: ParseList, onHover?: (tokens: IToken[]) =>
     return <div>{list.children.List[0].image}</div>
 }
 
-const getSubblockToken = (subblock: ParseRow | ParseColumn) => {
-    if(subblock.name === 'row') {
-        return subblock.children.Row[0]
+const getSubblockToken = (subblock: ParseRows | ParseColumns) => {
+    if(subblock.name === 'rows') {
+        return subblock.children.Rows[0]
     } else {
-        return subblock.children.Column[0]
+        return subblock.children.Columns[0]
     }
 }
 
 const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]) => void}) => {
-    const {row, column, item, list} = block.children;
+    const {rows, columns, item, list} = block.children;
 
-    const subblocks = [...(row || []), ...(column || [])]
+    const subblocks = [...(rows || []), ...(columns || [])]
         .sort((a, b) => (
             getSubblockToken(a).startOffset - getSubblockToken(b).startOffset
         ))
@@ -104,24 +113,35 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
     // TODO: [tests] Validate that blocks are column-directed by default
     subblocks.unshift({
         children: {
-            Column: block.children.Block,
+            In: block.children.Block,
+            Columns: block.children.Block,
             item,
             list
         },
-        name: 'column'
+        name: 'columns'
     })
 
     if(subblocks.length === 0)
         return null;
 
-    return subblocks.map(subblock => <div style={{display: 'flex', flexDirection: subblock.name}}>
-        {subblock.children.item && subblock.children.item.map(item => <Item item={item} onHover={onHover}/>)}
-        {subblock.children.list && subblock.children.list.map(list => <>
-            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
-            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
-            <WiredCard><List list={list} onHover={onHover}/></WiredCard>
-        </> )}
-    </div>)
+    return subblocks.map(subblock => {
+        const num = subblock.children.number ? numberTokenToNumber(subblock.children.number[0]) : 1;
+
+        const items: React.JSX.Element[] = []
+        subblock.children.item && subblock.children.item.forEach(item => items.push(<Item item={item} onHover={onHover}/>))
+        subblock.children.list && subblock.children.list.forEach(list => {
+            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+        })
+
+        // TODO: [perf] Make a better
+        return <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'column' : 'row'}}>
+            {Array(num).fill(0).map((_, i) => <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'row' : 'column'}}>
+                {items.filter((value, index) => index % num == i)}
+            </div>)}
+        </div>
+    })
 }
 const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => page.children.block ? <>{
         page.children.block.map((block,i) => <>
