@@ -9,7 +9,6 @@
     "watch:server": "nodemon \"./build/bundle.js\" --watch \"./build\" ",
     "watch:build": "webpack --watch",
     "build": "webpack; webpack --config ./webpack.renderer.config.js",
-    "startOld": "ts-node src/app.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "vadkou",

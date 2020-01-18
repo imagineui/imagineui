@@ -3,6 +3,8 @@ import {Wireframe} from "imagineui-core/src/wireframe";
 import {parseSceneToAST, ParseValue} from "imagineui-core/src/parse/ast";
 import 'wired-elements';
 import './index.css';
+import "imagineui-core/src/fonts/balsamiqsans.css";
+import 'imagineui-core/src/wireframe.css';
 import {Editor} from "./editor";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import {MarkerSeverity} from "monaco-editor";

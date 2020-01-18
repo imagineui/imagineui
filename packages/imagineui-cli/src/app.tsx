@@ -8,6 +8,7 @@ import {render} from "preact-render-to-string";
 import {Wireframe} from "imagineui-core/src/wireframe";
 import {parseSceneToAST} from "imagineui-core/src/parse/ast";
 import {initRussianNLP} from "imagineui-core/src/nlp/nlp-ru_RU";
+import {fonts} from "./inlinedbalsamiq";
 
 program
     .version('0.2.0', '-v, --version')
@@ -56,6 +57,7 @@ initRussianNLP(dictsPath).then(nlp => {
         ${renderBundle}
         </script>
         <style>
+        ${fonts}
         ${cssBundle}
         </style>
     </head>
@@ -68,18 +70,20 @@ initRussianNLP(dictsPath).then(nlp => {
     puppeteer.launch().then(browser => {
         browser.newPage().then(page => {
             page.setContent(html).then(() => {
-                page.screenshot({
-                    type: 'png', fullPage: true
-                }).then(result => {
-                    fs.writeFile(program.output, result, (err) => {
-                        if (err) {
-                            return console.log(err);
-                        }
+                page.evaluateHandle('document.fonts.ready').then(() => {
+                    page.screenshot({
+                        type: 'png', fullPage: true
+                    }).then(result => {
+                        fs.writeFile(program.output, result, (err) => {
+                            if (err) {
+                                return console.log(err);
+                            }
 
-                        console.log('Render complete!');
-                        console.log(program.output);
-                    });
-                    browser.close()
+                            console.log('Render complete!');
+                            console.log(program.output);
+                        });
+                        browser.close()
+                    })
                 })
             })
         })

@@ -16,7 +16,7 @@
     overflow: scroll;
 }
 
-.wireframe { grid-area: wireframe; display: flex; flex-direction: column; align-items: center;}
+.wireframe { grid-area: wireframe; }
 
 .token {
     background-color: #00000033;

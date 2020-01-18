@@ -124,29 +124,31 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
     if(subblocks.length === 0)
         return null;
 
-    return subblocks.map(subblock => {
-        const num = subblock.children.number ? numberTokenToNumber(subblock.children.number[0]) : 1;
+    return <>
+        {subblocks.map(subblock => {
+            const num = subblock.children.number ? numberTokenToNumber(subblock.children.number[0]) : 1;
 
-        const items: React.JSX.Element[] = []
-        subblock.children.item && subblock.children.item.forEach(item => items.push(<Item item={item} onHover={onHover}/>))
-        subblock.children.list && subblock.children.list.forEach(list => {
-            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
-            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
-            items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
-        })
+            const items: React.JSX.Element[] = []
+            subblock.children.item && subblock.children.item.forEach(item => items.push(<Item item={item} onHover={onHover}/>))
+            subblock.children.list && subblock.children.list.forEach(list => {
+                items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+                items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+                items.push(<WiredCard><List list={list} onHover={onHover}/></WiredCard>)
+            })
 
-        // TODO: [perf] Make a better
-        return <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'column' : 'row'}}>
-            {Array(num).fill(0).map((_, i) => <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'row' : 'column'}}>
-                {items.filter((value, index) => index % num == i)}
-            </div>)}
-        </div>
-    })
+            // TODO: [perf] Make a better
+            return <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'column' : 'row'}}>
+                {Array(num).fill(0).map((_, i) => <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'row' : 'column'}}>
+                    {items.filter((value, index) => index % num == i)}
+                </div>)}
+            </div>
+        })}
+    </>
 }
 const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => page.children.block ? <>{
         page.children.block.map((block,i) => <>
             <Block block={block} onHover={onHover}/>
-            {i !== page.children.block.length - 1 ? <WiredDivider/> : null}
+            {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
         </>)
     }</> : null;
 
