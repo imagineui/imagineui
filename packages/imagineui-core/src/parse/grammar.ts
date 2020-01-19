@@ -32,6 +32,7 @@ interface KeywordDictionary {
     with_scroll: string[];
 
     block: string[];
+    blocks: string[];
     example: string[];
     main: string[];
 
@@ -45,7 +46,6 @@ interface KeywordDictionary {
     with_icon: string[];
 
     aligned: string[];
-    // in: string[];
     rows: string[];
     columns: string[];
 }
@@ -74,6 +74,7 @@ const ru_RUKeywords: KeywordDictionary = {
     with_scroll: ['с прокруткой'],
 
     block: ['блок:'],
+    blocks: ['блоки'],
     example: ['примеры:'],
     main: ['главный'],
 
@@ -84,7 +85,7 @@ const ru_RUKeywords: KeywordDictionary = {
     image: ['картинка'],
 
     consists_of: ['включает в себя'],
-    aligned: ['расположены'],
+    aligned: ['расположены в', 'расположены'],
     // in: ['в'],
     with_icon: ['с иконкой'],
     rows: ['строка', 'строку', 'строчка', 'строчку', 'строки', 'строк', 'строкой', 'строчкой', 'строками', 'строчками'],
@@ -109,6 +110,7 @@ const buildTokenSet = (dict: KeywordDictionary) => {
         Tablet: createToken({name: "Tablet", pattern: toRegex(dict.tablet)}),
         Widescreen: createToken({name: "Widescreen", pattern: toRegex(dict.widescreen)}),
         Block: createToken({name: "Block", pattern: toRegex(dict.block)}),
+        Blocks: createToken({name: "Blocks", pattern: toRegex(dict.blocks)}),
         Example: createToken({name: "Example", pattern: toRegex(dict.example)}),
         Main: createToken({name: "Main", pattern: toRegex(dict.main)}),
         Field: createToken({name: "Field", pattern: toRegex(dict.field)}),
@@ -160,6 +162,7 @@ const {
     Tablet,
     Widescreen,
     Block,
+    Blocks,
     Example,
     Main,
     Field,
@@ -209,7 +212,7 @@ const Variable = createToken({
 });
 
 const NaturalLiteral = createToken({
-    name: "NaturalLiteral", pattern: /([a-zA-Zа-яА-Я ,./()'-])+/
+    name: "NaturalLiteral", pattern: /([a-zA-Zа-яА-ЯёЁ ,./()'-])+/
 });
 
 
@@ -218,7 +221,7 @@ const NumberLiteral = createToken({
 });
 const LineEnd = createToken({
     name: "LineEnd",
-    pattern: /\n+/
+    pattern: /[ ?]*\n/
 });
 const WhiteSpace = createToken({
     name: "WhiteSpace",
@@ -228,7 +231,7 @@ const WhiteSpace = createToken({
 
 const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
     Page, Mobile, Tablet, Widescreen,
-    Block,
+    Block, Blocks,
     Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
     ...Object.values(NumericTokenSet),
     NaturalLiteral];
@@ -267,6 +270,7 @@ export class SceneParser extends Parser {
     readonly comment!: (idx: number) => any;
     readonly literal!: (idx: number) => any;
     readonly number!: (idx: number) => any;
+    readonly blockalign!: (idx: number) => any;
 
     constructor() {
         super(sceneTokens, {
@@ -296,13 +300,21 @@ export class SceneParser extends Parser {
             $.CONSUME(Page);
             // $.CONSUME(WhiteSpace);
             $.SUBRULE($.value);
-            $.CONSUME(LineEnd);
-            $.MANY(() => {
+            $.CONSUME1(LineEnd);
+            $.MANY1(() => {
                 $.OR2([
                     {ALT: () => $.SUBRULE($.block)},
-                    {ALT: () => $.SUBRULE($.example)}
+                    {ALT: () => $.SUBRULE($.example)},
+                    {ALT: () => $.CONSUME2(LineEnd)}
                 ]);
             })
+            // $.SUBRULE($.blockalign)
+
+            // $.CONSUME(WhiteSpace);
+            $.MANY2(() => {
+                $.SUBRULE($.blockalign)
+            })
+
         });
 
         $.RULE("block", () => {
@@ -311,17 +323,19 @@ export class SceneParser extends Parser {
             });
             $.CONSUME(Block);
             $.SUBRULE($.value);
-            $.CONSUME(LineEnd);
+            $.CONSUME1(LineEnd);
             $.MANY1(() => {
                 $.OR1([
                     {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)}
+                    {ALT: () => $.SUBRULE($.list)},
+                    {ALT: () => $.CONSUME2(LineEnd)}
                 ])
             });
             $.MANY2(() => {
                 $.OR2([
                     {ALT: () => $.SUBRULE($.rows)},
                     {ALT: () => $.SUBRULE($.columns)},
+                    {ALT: () => $.CONSUME3(LineEnd)}
                     ])
             });
         });
@@ -332,11 +346,12 @@ export class SceneParser extends Parser {
                 $.SUBRULE($.number);
             });
             $.CONSUME(Rows);
-            $.CONSUME(LineEnd);
+            $.CONSUME1(LineEnd);
             $.MANY(() => {
                 $.OR([
                     {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)}
+                    {ALT: () => $.SUBRULE($.list)},
+                    {ALT: () => $.CONSUME2(LineEnd)}
                 ])
             });
         });
@@ -347,13 +362,33 @@ export class SceneParser extends Parser {
                 $.SUBRULE($.number);
             })
             $.CONSUME(Columns);
-            $.CONSUME(LineEnd);
+            $.CONSUME1(LineEnd);
             $.MANY(() => {
                 $.OR([
                     {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)}
+                    {ALT: () => $.SUBRULE($.list)},
+                    {ALT: () => $.CONSUME2(LineEnd)}
                 ])
             });
+        });
+
+        $.RULE("blockalign", () => {
+            $.CONSUME(Blocks);
+            $.MANY_SEP({
+                SEP: Comma, DEF: () => {
+                    $.SUBRULE($.value);
+                }
+            });
+            $.CONSUME(Aligned);
+            // $.CONSUME(In);
+            $.OPTION(() => {
+                $.SUBRULE($.number);
+            });
+            $.OR([
+                {ALT: () => $.CONSUME(Rows)},
+                {ALT: () => $.CONSUME(Columns)}
+            ])
+            $.CONSUME(LineEnd);
         });
 
         $.RULE("item", () => {

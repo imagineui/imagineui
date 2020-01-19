@@ -51,7 +51,7 @@ export const numberTokenToNumber = ({children}: ParseNumber) => {
     throw new Error('Parsed number has no tokens')
 }
 
-interface ParseTextValue {
+export interface ParseTextValue {
     children: {
         NaturalLiteral: [IToken]
         StringLiteral: [IToken]
@@ -70,6 +70,18 @@ export interface ParseItem {
         literal? : [ParseText]
     }
     name: 'item'
+}
+
+export interface ParseBlockAlign {
+    children: {
+        Blocks: [IToken]
+        value: ParseTextValue[]
+        Aligned: [IToken]
+        number?: [ParseNumber]
+        Rows?: [IToken]
+        Columns?: [IToken]
+    }
+    name: 'blockalign'
 }
 
 export interface ParseColumns {
@@ -122,7 +134,8 @@ export interface ParsePage {
         Widescreen?: [IToken],
         Page: [IToken],
         value: IToken[],
-        block?: ParseBlock[]
+        block?: ParseBlock[],
+        blockalign?: ParseBlockAlign[],
         list: ParseList[]
     }
     name: 'page'

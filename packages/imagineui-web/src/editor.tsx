@@ -115,51 +115,45 @@ const syntax = `
 </plist>
 `
 
-const helpContent =
-`Страница: Справка
-Главный Блок: Каталог
-    Кнопка
-    Поле ввода поискового запроса с иконкой Search
-    Список тем
-    Тема включает в себя
-        Заголовок
-        <Ссылку на статью>
-
-Примеры: // Примеры можно давать как по типу элемента, так и по переменной (как с CSS Selector'ами)
-    Заголовок: "", ""
-    <Ссылка на статью>: "", ""
-    
+const landing =
+`Широкоформатный Экран: Посадочная страница
 Блок: Навигация
-    Картинка Логотип
-    Заголовок Справка
-    Ссылка на чат с поддержкой
-    
-Навигация расположена в шапке
-`
-
-const loginContent =
-`Экран: Авторизация
-Главный Блок: Вход
-    Картинка Логотип
-    Заголовок
-    Поле e-mail или номера телефона
-    Поле ввода пароля
-    Кнопка "Войти"
-Блок: Сервис
     Одна строка
-    Кнопка восстановления доступа
-    Кнопка регистрации
-    "2020 @vadkou"
-Блок: Справка
+    "ImagineUI"
+    Кнопка Песочница
+    Кнопка Документация
+    Кнопка Партнёры
+    Кнопка Сообщество
+    Кнопка Подписаться
+
+Главный Блок: Подписка
+    Заголовок Подпишись на рассылку
+    Поле "полное имя"
+    Поле e-mail
+    Кнопка "Подписаться"
+    "или попробуй alpha-версию"
     Два столбца
+    Кнопка Песочница
+    Кнопка CLI
+    Один столбец
+    "Подписавшись, вы принимаете Политику Приватности"
+
+Блок: Описание
+    Заголовок "DSL для макетов вёрстки"
+    "Open-source инструмент для генерации low-fidelity макетов по формату, имитирующему естественную речь"
+
+Блок: Партнёры
+    "В продуктовке и на outsource, компании внедряют ImagineUI"
+    Одна строка
     Список тем
         включает в себя
-            Заголовок
-            <Ссылку на статью>
+            Картинка лого партнёра
 
+Блоки "Описание", "Подписка" расположены в два столбца 
 
 // Схема на русском языке для демонстрации заложенной возможности 
 // локализованных вариаций языка по типу Gherkin
+
 `
 
 export async function liftOff(container: HTMLElement) {
@@ -184,13 +178,11 @@ export async function liftOff(container: HTMLElement) {
 
     const grammars = new Map()
     grammars.set('imagineui_scene', 'source.imagineui_scene')
-    // grammars.set('html', 'text.html.basic')
-    // grammars.set('typescript', 'source.ts')
 
     await wireTmGrammars(monaco, registry, grammars)
 
     return monaco.editor.create(container, {
-        value: loginContent,
+        value: landing,
         language: 'imagineui_scene' // this won't work out of the box, see below for more info
     })
 }
@@ -201,7 +193,7 @@ export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentCha
         if(container.current) {
             liftOff(container.current).then(editor => {
                 editor.onDidChangeModelContent((ev) => onChange(ev, editor))
-                editor.getModel()!.setValue(loginContent)
+                editor.getModel()!.setValue(landing)
             })
         }
     }, [container])

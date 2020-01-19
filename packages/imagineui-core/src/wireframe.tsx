@@ -7,7 +7,7 @@ import {
     ParseItem,
     ParseList,
     ParsePage,
-    ParseRows,
+    ParseRows, ParseTextValue,
     ParseValue
 } from "./parse/ast";
 import {wireframeContext} from "./store";
@@ -17,6 +17,18 @@ interface WireframeProps {
     sceneDescription: ParseValue | null;
     className?: string;
     onHover?: (tokens: IToken[]) => void;
+}
+
+const getTokenImage = (literal: ParseTextValue) => {
+    const {NaturalLiteral, StringLiteral, Variable} = literal.children;
+    if(NaturalLiteral)
+        return NaturalLiteral[0].image
+    if(StringLiteral)
+        return StringLiteral[0].image.substring(1, StringLiteral[0].image.length-1)
+    if(Variable)
+        return Variable[0].image.substring(1, Variable[0].image.length-1)
+
+    throw new Error('AST has returned a ParseTextValue without a text value')
 }
 
 const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) => void}) => {
@@ -57,7 +69,7 @@ const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) =>
     }
 
     if(Field) {
-        return <WiredInput {...elProps} placeholder={text || Field[0].image}></WiredInput>
+        return <WiredInput {...elProps} style={{flex:1}} placeholder={text || Field[0].image}></WiredInput>
     }
 
     if(Header) {
@@ -146,16 +158,74 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
     </>
 }
 
+interface AlignRule {
+    name: 'columns' | 'rows'
+    number: number
+    blocks: string[]
+}
+
 const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => {
 
-    const {Mobile, Tablet, Widescreen} = page.children;
+    const {Mobile, Tablet, Widescreen, block, blockalign} = page.children;
 
-    const blocks = page.children.block
-            ? page.children.block.map((block,i) => <>
-                <Block block={block} onHover={onHover}/>
-                {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
-            </>)
-            : null
+    const mentions = new Map<string, AlignRule>()
+    const placedMention = new Set<string>()
+
+    const alignRules = blockalign?.map((align): AlignRule=> ({
+            name: align.children.Rows ? 'rows' : 'columns',
+            number: align.children.number ? numberTokenToNumber(align.children.number[0]) : 1,
+            blocks: align.children.value.map(getTokenImage)
+        })) ?? [];
+
+    // TODO: [conformity] Throw an error on conflicting mentions
+    alignRules.forEach(rule => rule.blocks.forEach(block => mentions.set(block, rule)))
+
+    // const rules = block ? block.map(block => block.children.value.map(getTokenImage).join(', ')) : []
+
+    const rules: AlignRule[] = []
+    const blockRefs = new Map<string, ParseBlock>();
+
+    block?.forEach(ref => {
+        const image = getTokenImage(ref.children.value[0])
+
+        blockRefs.set(image, ref)
+
+        if(placedMention.has(image))
+            return
+
+        const rule = mentions.get(image);
+
+        if(rule) {
+            rules.push(rule)
+            rule.blocks.forEach(block => placedMention.add(block))
+            return
+        }
+
+        rules.push({
+            name: "columns",
+            number: 1,
+            blocks: [image]
+        })
+        // TODO: [conformity] Throw an error on duplicates
+        placedMention.add(image)
+    })
+
+    console.log(rules)
+
+    const blocks = rules.map((rule,i) => {
+
+        return <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
+            {Array(rule.number).fill(0).map((_, i) =>
+                <div style={{display: 'flex', flex: 1, flexDirection: rule.name === 'rows' ? 'row' : 'column'}}>
+                {rule.blocks.filter((value, index) => index % rule.number == i)
+                    .map(block => <Block block={blockRefs.get(block)!} onHover={onHover}/>)}
+            </div>)}
+        </div>
+
+        return <>
+
+            {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
+        </>});
 
     // TODO: [guide] Guidelines should be in
     let width = 0;
