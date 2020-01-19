@@ -7,7 +7,7 @@ import React from "preact/compat";
 import {render} from "preact-render-to-string";
 import {Wireframe} from "imagineui-core/src/wireframe";
 import {parseSceneToAST} from "imagineui-core/src/parse/ast";
-import {initRussianNLP} from "imagineui-core/src/nlp/nlp-ru_RU";
+import {initRussianNLP} from "imagineui-core/src/locales/ru_RU/nlp";
 import {fonts} from "./inlinedbalsamiq";
 
 program

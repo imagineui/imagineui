@@ -9,7 +9,7 @@ import {Editor} from "./editor";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import {MarkerSeverity} from "monaco-editor";
 import {StateProvider, WireframeActionTypes, wireframeContext} from "imagineui-core/src/store";
-import {initRussianNLP} from "imagineui-core/src/nlp/nlp-ru_RU";
+import {initRussianNLP} from "imagineui-core/src/locales/ru_RU/nlp";
 import {IToken} from "chevrotain";
 
 let theEditor: monaco.editor.IStandaloneCodeEditor | null = null;

@@ -210,22 +210,14 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
         placedMention.add(image)
     })
 
-    console.log(rules)
-
-    const blocks = rules.map((rule,i) => {
-
-        return <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
+    const blocks = rules.map((rule,i) =>
+        <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
             {Array(rule.number).fill(0).map((_, i) =>
                 <div style={{display: 'flex', flex: 1, flexDirection: rule.name === 'rows' ? 'row' : 'column'}}>
                 {rule.blocks.filter((value, index) => index % rule.number == i)
                     .map(block => <Block block={blockRefs.get(block)!} onHover={onHover}/>)}
             </div>)}
-        </div>
-
-        return <>
-
-            {i !== page.children.block!.length - 1 ? <WiredDivider/> : null}
-        </>});
+        </div>);
 
     // TODO: [guide] Guidelines should be in
     let width = 0;

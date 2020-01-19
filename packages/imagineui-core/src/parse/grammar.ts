@@ -1,253 +1,7 @@
 import * as chevrotain from 'chevrotain';
-import {Rule} from "chevrotain";
-
-const createToken = chevrotain.createToken;
+import {buildTokensForLocale} from "./tokens";
+import {TokenType} from "chevrotain";
 const Lexer = chevrotain.Lexer;
-
-/**
- * Natural language numerics are limited to a 12-column system
- * TODO: Consider parsing all numerals
- */
-interface NumericDictionary {
-    zero: string[];
-    one: string[];
-    two: string[];
-    three: string[];
-    four: string[];
-    five: string[];
-    six: string[];
-    seven: string[];
-    eight: string[];
-    nine: string[];
-    ten: string[];
-    eleven: string[];
-    twelve: string[];
-}
-
-interface KeywordDictionary {
-    page: string[];
-    mobile: string[];
-    tablet: string[];
-    widescreen: string[];
-    with_scroll: string[];
-
-    block: string[];
-    blocks: string[];
-    example: string[];
-    main: string[];
-
-    header: string[];
-    field: string[];
-    button: string[];
-    list: string[];
-    image: string[];
-
-    consists_of: string[];
-    with_icon: string[];
-
-    aligned: string[];
-    rows: string[];
-    columns: string[];
-}
-
-const ru_RUNumbers: NumericDictionary = {
-    zero: ['ноль','ноля','нолю'],
-    one: ['один', 'одна', 'одного', 'одну', 'одним', 'одной'],
-    two: ['два', 'две', 'двум','двумя'],
-    three: ['три','трём','тремя'],
-    four: ['четыре', 'четырём','четыремя'],
-    five: ['пять', 'пяти', 'пятью'],
-    six: ['шесть', 'шести','шестью'],
-    seven: ['семь', 'семи','семью'],
-    eight: ['восемь', 'восьми', 'восьмью'],
-    nine: ['девять', 'девяти', 'девятью'],
-    ten: ['десять', 'десяти', 'десятью'],
-    eleven: ['одиннадцать', 'одиннадцати', 'одиннадцатью'],
-    twelve: ['двенадцать', 'двенадцати', 'двенадцатью'],
-}
-// TODO: [perf] Pre-bake patterns with all necessary inflections with a compile-time script
-const ru_RUKeywords: KeywordDictionary = {
-    page: ['страница:', 'экран:'],
-    mobile: ['мобильный', 'мобильная'],
-    tablet: ['планшетный', 'планшетная', 'ноутбучный', 'ноутбучная'],
-    widescreen: ['широкоформатный', 'широкоформатная'],
-    with_scroll: ['с прокруткой'],
-
-    block: ['блок:'],
-    blocks: ['блоки'],
-    example: ['примеры:'],
-    main: ['главный'],
-
-    header: ['заголовок'],
-    field: ['поле ввода','поле'],
-    button: ['кнопка','ссылка'],
-    list: ['список'],
-    image: ['картинка'],
-
-    consists_of: ['включает в себя'],
-    aligned: ['расположены в', 'расположены'],
-    // in: ['в'],
-    with_icon: ['с иконкой'],
-    rows: ['строка', 'строку', 'строчка', 'строчку', 'строки', 'строк', 'строкой', 'строчкой', 'строками', 'строчками'],
-    columns: ['столбец', 'столбца', 'столбцов', 'столбцом'], // TODO: [lint] Auto-correction for plural inflections
-}
-
-const buildPatternFromWord = (word: string) => {
-    const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`
-    const wordMatch = `${caseInsensitive}${word.substring(1).replace('ё', '[её]')}`
-    return `\s+${wordMatch}|${wordMatch}`
-}
-
-const buildRegexFromWords = (words: string[]) =>
-    new RegExp(words.map(buildPatternFromWord).join('|'))
-
-const buildTokenSet = (dict: KeywordDictionary) => {
-    const toRegex = buildRegexFromWords
-
-    return {
-        Page: createToken({name: "Page", pattern: toRegex(dict.page)}),
-        Mobile: createToken({name: "Mobile", pattern: toRegex(dict.mobile)}),
-        Tablet: createToken({name: "Tablet", pattern: toRegex(dict.tablet)}),
-        Widescreen: createToken({name: "Widescreen", pattern: toRegex(dict.widescreen)}),
-        Block: createToken({name: "Block", pattern: toRegex(dict.block)}),
-        Blocks: createToken({name: "Blocks", pattern: toRegex(dict.blocks)}),
-        Example: createToken({name: "Example", pattern: toRegex(dict.example)}),
-        Main: createToken({name: "Main", pattern: toRegex(dict.main)}),
-        Field: createToken({name: "Field", pattern: toRegex(dict.field)}),
-        Button: createToken({name: "Button", pattern: toRegex(dict.button)}),
-        Header: createToken({name: "Header", pattern: toRegex(dict.header)}),
-        List: createToken({name: "List", pattern: toRegex(dict.list)}),
-        Image: createToken({name: "Image", pattern: toRegex(dict.image)}),
-        WithIcon: createToken({name: "WithIcon", pattern: toRegex(dict.with_icon)}),
-        ConsistsOf: createToken({name: "ConsistsOf", pattern: toRegex(dict.consists_of)}),
-        Aligned: createToken({name: "Aligned", pattern: toRegex(dict.aligned)}),
-        // In: createToken({name: "In", pattern: toRegex(dict.in)}),
-        Rows: createToken({name: "Rows", pattern: toRegex(dict.rows)}),
-        Columns: createToken({name: "Columns", pattern: toRegex(dict.columns)}),
-        Comma: createToken({name: "Comma", pattern: /,/}),
-        Colon: createToken({name: "Colon", pattern: /:/}),
-    }
-}
-
-const buildNumsSet = (dict: NumericDictionary) => {
-    const toRegex = buildRegexFromWords
-
-    return {
-        Zero: createToken({name: "Zero", pattern: toRegex(dict.zero)}),
-        One: createToken({name: "One", pattern: toRegex(dict.one)}),
-        Two: createToken({name: "Two", pattern: toRegex(dict.two)}),
-        Three: createToken({name: "Three", pattern: toRegex(dict.three)}),
-        Four: createToken({name: "Four", pattern: toRegex(dict.four)}),
-        Five: createToken({name: "Five", pattern: toRegex(dict.five)}),
-        Six: createToken({name: "Six", pattern: toRegex(dict.six)}),
-        Seven: createToken({name: "Seven", pattern: toRegex(dict.seven)}),
-        Eight: createToken({name: "Eight", pattern: toRegex(dict.eight)}),
-        Nine: createToken({name: "Nine", pattern: toRegex(dict.nine)}),
-        Ten: createToken({name: "Ten", pattern: toRegex(dict.ten)}),
-        Eleven: createToken({name: "Eleven", pattern: toRegex(dict.eleven)}),
-        Twelve: createToken({name: "Twelve", pattern: toRegex(dict.twelve)}),
-    }
-}
-
-const CONSISTS_OF = /(включает в себя)/
-const ALIGNED = /(расположены по)/
-const WITH_ICON = /(с иконкой)/
-
-const TokenSet = buildTokenSet(ru_RUKeywords)
-const NumericTokenSet = buildNumsSet(ru_RUNumbers)
-
-const {
-    Page,
-    Mobile,
-    Tablet,
-    Widescreen,
-    Block,
-    Blocks,
-    Example,
-    Main,
-    Field,
-    Button,
-    Header,
-    List,
-    Image,
-    Aligned,
-    WithIcon,
-    ConsistsOf,
-    // In,
-    Rows,
-    Columns,
-    Comma,
-    Colon
-} = TokenSet;
-
-const {
-    Zero,
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine,
-    Ten,
-    Eleven,
-    Twelve,
-} = NumericTokenSet;
-
-export const KEYWORDS_PATTERN = Object.values(ru_RUKeywords).map(buildRegexFromWords).map(regex => regex.source).join('|')
-
-const Comment = createToken({
-    name: 'Comment',
-    pattern: /\/\/.*/,
-    group: Lexer.SKIPPED
-});
-
-const StringLiteral = createToken({
-    name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-});
-const Variable = createToken({
-    name: "Variable", pattern: /<(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*>/
-});
-
-const NaturalLiteral = createToken({
-    name: "NaturalLiteral", pattern: /([a-zA-Zа-яА-ЯёЁ ,./()'-])+/
-});
-
-
-const NumberLiteral = createToken({
-    name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-});
-const LineEnd = createToken({
-    name: "LineEnd",
-    pattern: /[ ?]*\n/
-});
-const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
-});
-
-const sceneTokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
-    Page, Mobile, Tablet, Widescreen,
-    Block, Blocks,
-    Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
-    ...Object.values(NumericTokenSet),
-    NaturalLiteral];
-
-export const SceneLexer = new Lexer(sceneTokens, {
-    // Less position info tracked, reduces verbosity of the playground output.
-    positionTracking: "onlyStart", safeMode: true,
-});
-
-// Labels only affect error messages and Diagrams.
-// LCurly.LABEL = "'{'";
-// RCurly.LABEL = "'}'";
-// LSquare.LABEL = "'['";
-// RSquare.LABEL = "']'";
-Comma.LABEL = "','";
-Colon.LABEL = "':'";
 
 
 // ----------------- parser -----------------
@@ -272,10 +26,27 @@ export class SceneParser extends Parser {
     readonly number!: (idx: number) => any;
     readonly blockalign!: (idx: number) => any;
 
-    constructor() {
-        super(sceneTokens, {
+    constructor(tokenSets: ReturnType<typeof buildTokensForLocale>, tokens: TokenType[]) {
+        super(tokens, {
             recoveryEnabled: true
         })
+
+        const {LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, NaturalLiteral,
+            Comma,
+            Colon} = tokenSets.CommonTokens;
+
+        const {
+            Page, Mobile, Tablet, Widescreen,
+            Block, Blocks,
+            Example, Main,
+            Field, Button, Header, List, Image,
+            Aligned, WithIcon, ConsistsOf,
+            Rows, Columns,
+        } = tokenSets.TokenSet;
+
+        const {
+            Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve,
+        } = tokenSets.NumericTokenSet;
 
         const $ = this;
 

@@ -1,5 +1,8 @@
-import {SceneLexer, SceneParser} from "./grammar";
-import {ILexingError, IRecognitionException, IToken} from "chevrotain";
+import {SceneParser} from "./grammar";
+import {ILexingError, IRecognitionException, IToken, Lexer, TokenType} from "chevrotain";
+import {detectLocale} from "../locales";
+import {Dictionary, Locale} from "../locales/types";
+import {buildTokensForLocale} from "./tokens";
 
 interface ParseText {
     children: {
@@ -155,28 +158,93 @@ interface ParseResult {
     parseErrors?: IRecognitionException[];
 }
 
-let parserInstance: SceneParser
+type localeParsersStorage = {
+    [index in Locale]?: {
+        tokenSets: ReturnType<typeof buildTokensForLocale>
+        tokens: TokenType[]
+        lexer: Lexer
+        parser: SceneParser
+    }
+}
+
+const localeParsers: localeParsersStorage = {}
+
 export function parseSceneToAST(sceneText: string): ParseResult {
-    const lexResult = SceneLexer.tokenize(sceneText);
+    const locale = detectLocale(sceneText)
+    if(!locale) {
+        return {
+            lexErrors: [{
+                line: 0,
+                column: 0,
+                offset: 0,
+                length: 10,
+                message: 'No locale detected. Please use one of the locale-specific keywords for .scene ("экран:", "screen:", etc.)'
+            }]
+        }
+    }
+
+    let storage = localeParsers[locale]
+
+    if (storage === undefined) {
+
+        const tokenSets = buildTokensForLocale(locale)
+
+        const {LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, NaturalLiteral,
+            Comma,
+            Colon} = tokenSets.CommonTokens;
+
+        // TODO: [locales] Localize token names and error messages
+        Comma.LABEL = "','";
+        Colon.LABEL = "':'";
+
+        const {
+            Page, Mobile, Tablet, Widescreen,
+            Block, Blocks,
+            Example, Main,
+            Field, Button, Header, List, Image,
+            Aligned, WithIcon, ConsistsOf,
+            Rows, Columns,
+        } = tokenSets.TokenSet;
+
+        const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
+            Page, Mobile, Tablet, Widescreen,
+            Block, Blocks,
+            Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
+            ...Object.values(tokenSets.NumericTokenSet),
+            NaturalLiteral];
+
+        storage = {
+            tokenSets,
+            tokens,
+            lexer: new Lexer(tokens, {
+                // Less position info tracked, reduces verbosity of the playground output.
+                positionTracking: "onlyStart", safeMode: true
+                // positionTracking: "onlyStart", skipValidations: true, ensureOptimizations: true TODO: enable optimizations
+            }),
+            parser: new SceneParser(tokenSets, tokens) // {outputCst:false}
+        }
+
+        localeParsers[locale] = storage;
+    }
+
+    const {parser, lexer} = storage!;
+
+    const lexResult = lexer.tokenize(sceneText);
     if (lexResult.errors.length > 0) {
         return {
             lexErrors: lexResult.errors
         }
     }
 
-    if (parserInstance === undefined) {
-        parserInstance = new SceneParser() // {outputCst:false}
-    }
-
     // setting a new input will RESET the parser instance's state.
-    parserInstance.input = lexResult.tokens;
+    parser.input = lexResult.tokens;
 
     // @ts-ignore
-    const value = parserInstance.scene();
+    const value = parser.scene();
 
-    if (parserInstance.errors.length > 0) {
+    if (parser.errors.length > 0) {
         return {
-            parseErrors: parserInstance.errors,
+            parseErrors: parser.errors,
             lexTokens: lexResult.tokens,
         }
     }

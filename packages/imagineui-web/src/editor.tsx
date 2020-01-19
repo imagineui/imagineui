@@ -3,7 +3,7 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import {KEYWORDS_PATTERN} from "imagineui-core/src/parse/grammar";
+import {KEYWORDS_PATTERN} from "imagineui-core/src/parse/tokens";
 
 // const onigasmWasm = require('onigasm/lib/onigasm.wasm') TODO: Webpack WASM Loader https://github.com/webpack/webpack/issues/7352
 // const syntax = require('./scene_syntax.xml') TODO: Fix raw file loader
@@ -115,7 +115,50 @@ const syntax = `
 </plist>
 `
 
-const landing =
+const en_landing =
+`Widescreen Page: Landing page
+Block: Navigation
+    One row
+    "ImagineUI"
+    Link to Sandbox
+    Link to Documentation
+    Link to Partners
+    Link to Community
+    Link to Subscribe
+
+Main Block: Subscription
+    Header Subscribe to our newsletter
+    Input "full name"
+    Input e-mail
+    Button "Subscribe"
+    "or try out the alpha-version"
+    Two columns
+    Button Sandbox
+    Button CLI
+    One column
+    "By subscribing, you accept the Privacy Policy"
+
+Block: Description
+    Header "DSL for mock-ups"
+    "Open-source tool for low-fidelity mock-ups (wireframes) generation with a format that imitates natural speech."
+
+Block: Партнёры
+    "In enterprises and in outsource, companies try ImagineUI"
+    One row
+    List of partners
+        consists of
+            Image partner logo
+
+Blocks "Description", "Subscription" aligned in two columns
+
+// Format allows localized keywords like Gherkin
+// To try the Russian version, use the "Экран:"/"Страница:" keyword first
+// and consult the docs for the rest.
+//
+// imagineui.github.io
+`
+
+const ru_landing =
 `Широкоформатный Экран: Посадочная страница
 Блок: Навигация
     Одна строка
@@ -152,8 +195,11 @@ const landing =
 Блоки "Описание", "Подписка" расположены в два столбца 
 
 // Схема на русском языке для демонстрации заложенной возможности 
-// локализованных вариаций языка по типу Gherkin
-
+// локализованных вариаций языка по типу Gherkin.
+// Чтобы попробовать английскую версию, используйте в начале ключевое слово "Page:"/"Screen:".
+// Для подробностей, обратитесь к документации.
+//
+// imagineui.github.io
 `
 
 export async function liftOff(container: HTMLElement) {
@@ -182,7 +228,7 @@ export async function liftOff(container: HTMLElement) {
     await wireTmGrammars(monaco, registry, grammars)
 
     return monaco.editor.create(container, {
-        value: landing,
+        value: en_landing,
         language: 'imagineui_scene' // this won't work out of the box, see below for more info
     })
 }
@@ -193,7 +239,7 @@ export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentCha
         if(container.current) {
             liftOff(container.current).then(editor => {
                 editor.onDidChangeModelContent((ev) => onChange(ev, editor))
-                editor.getModel()!.setValue(landing)
+                editor.getModel()!.setValue(en_landing)
             })
         }
     }, [container])

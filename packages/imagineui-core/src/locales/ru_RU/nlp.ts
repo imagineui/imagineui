@@ -1,6 +1,6 @@
 // @ts-ignore  fixme: typings for Az and consistent API between forks
 import {default as Az} from 'az';
-import {NLProcessor} from "../store";
+import {NLProcessor} from "../../store";
 
 function initAz(dictPath: string) {
     return new Promise(((resolve, reject) => {
