@@ -80,4 +80,8 @@ const Playground = () => {
     </div>
 }
 
-render(<StateProvider><Playground/></StateProvider>, document.getElementById('root')!);
+const parent = document.currentScript!.parentElement!
+const container = document.createElement('div')
+parent.appendChild(container)
+
+render(<StateProvider><Playground/></StateProvider>, container);
