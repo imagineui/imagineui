@@ -3,7 +3,13 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import {KEYWORDS_PATTERN} from "imagineui-core/src/parse/tokens";
+import {buildRegexFromWords, localeDictionaries} from "imagineui-core/src/locales";
+
+export const KEYWORDS_PATTERN = Object.values(localeDictionaries)
+    .map(dicts => Object.values(dicts.keywords).map((keyword) =>
+        buildRegexFromWords(keyword, dicts.buildPatternFromWord)))
+    .flat()
+    .map(regex => regex.source).join('|')
 
 // const onigasmWasm = require('onigasm/lib/onigasm.wasm') TODO: Webpack WASM Loader https://github.com/webpack/webpack/issues/7352
 // const syntax = require('./scene_syntax.xml') TODO: Fix raw file loader
@@ -196,6 +202,9 @@ export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentCha
             liftOff(container.current).then(editor => {
                 editor.onDidChangeModelContent((ev) => onChange(ev, editor))
                 editor.getModel()!.setValue(content)
+                const height = editor.getDomNode()!.parentElement!.parentElement!.getBoundingClientRect().height
+                editor.getDomNode()!.style.height = `${height}px`
+                editor.layout()
             })
         }
     }, [container])

@@ -5,10 +5,12 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "yarn workspace imagineui-cli start",
+    "start": "yarn workspace imagineui-cli start:built",
+    "build": "yarn workspace imagineui-cli build",
     "imagineui": "yarn workspace imagineui-cli start",
     "dev-web": "yarn workspace imagineui-web start",
-    "test": "test"
+    "test": "test",
+    "postinstall": "yarn workspace imagine-cli build"
   },
   "repository": {
     "type": "git",

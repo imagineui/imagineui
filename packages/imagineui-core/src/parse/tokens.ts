@@ -86,9 +86,3 @@ export const buildTokensForLocale = (locale: Locale) => {
         TokenSet, NumericTokenSet, CommonTokens
     }
 }
-
-export const KEYWORDS_PATTERN = Object.values(localeDictionaries)
-    .map(dicts => Object.values(dicts.keywords).map((keyword) =>
-        buildRegexFromWords(keyword, dicts.buildPatternFromWord)))
-    .flat()
-    .map(regex => regex.source).join('|')

@@ -74,8 +74,10 @@ const Playground = () => {
         }))) || []
     }, [])
 
-    return <div className="playground">
-        <Editor onChange={onChange}/>
+    return <div className="sandbox__view">
+        <div className="sandbox__input">
+            <Editor onChange={onChange}/>
+        </div>
         <Wireframe className="wireframe" sceneDescription={sceneAST} onHover={onHover}/>
     </div>
 }
