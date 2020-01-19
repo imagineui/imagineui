@@ -1,39 +1,28 @@
 # ImagineUI
-CLI tool to generate wireframes from a localized human-readable format
+ImagineUI is a tool that supports developing wireframes in a localized human-readable format.
 
-:warning: Work in progress :wrench: :construction:
+[Try it out](https://imagineui.github.io)
 
-### Basic concepts
+:warning: Early alpha. Things may break. :wrench: :construction:
 
-* Scene (.scene) – Describes entities and general areas designed to allow user to access certain features.
-[Details in code](packages/imagineui-core/src/types/logic.ts)
-* Guides (.guide) – Target-specific instructions for building layouts (i.e. to accommodate screen resolution, UI guidelines, etc.)
+Please provide feedback and vote for features on the [issues page](https://github.com/imagineui/imagineui/issues)
 
-#### Principles
-* [Unix way](https://en.wikipedia.org/wiki/Unix_philosophy). 
-    * Hence 1 input file corresponds to 1 output. Advanced templating is to be done with higher-order tools (i.e. [Foliant](https://foliant-docs.github.io/docs/))
-* DocOps; VCS, CI, Single-source, integration into existing toolsets should be as seamless as possible 
-* .scene format should feel familiar for tech.writers, as they are the most possible candidates for user-base.
-* Output should not try to look like too much like a mock-up, so as not to be confused with the final product before any UI/UX designer steps in.  
-
-![logic flow diagram](docs/logic_flow.png)
-
-### Roadmap
-
-- [x] Scene Inflation/Layout Measurement tech.demo with Flexbox, hardcoded .guide and .yaml scene descriptions
-- [ ] Define the .guide API, rules to choose widgets and an enhanced renderer
-- [ ] Test coverage, CLI UX, usage docs with API and popular cases
-- [ ] Document (Gherkin-like) .scene format, implement a parser
-- [ ] Optimize rendering time (prebuilt TS, running daemon, incremental builds, etc.)
-
-### Similar work
-* [Gherkin/Cucumber](http://cucumber.io/) – Successful natural-feeling language framework 
-* [PlantUML Salt](http://plantuml.com/salt) – Good DocOps experience, poor UI renders 
-* Text adventures – Scene/Props/Actions routine somewhat make sense to describe UI
+To get involved you can also refer to the [thought process doc](https://imagineui.github.io/en/docs/grokking/thought-process/) (quazi-white paper) and share your thoughts at [vadkou@wave909.com](mailto:vadkou@wave909.com)
 
 ## Usage
 
-### Demo SVG render from the internal scene structure
+### Editor
+https://imagineui.github.io
+
+### CLI
+We are in the process of packaging up ImagineUI as the CLI. 
+You can try the alpha version by pulling sources from GitHub.
 ```
-npm run start -- --input ./tests/messenger.yaml --output ./messenger.svg
+# You need to install Puppeteer globally first
+npm install -g puppeteer
+
+git clone git@github.com:imagineui/imagineui.git
+cd imagineui
+yarn
+yarn start --input=%full-path-to-.scene% --output=%full-path-to-.png%
 ```
