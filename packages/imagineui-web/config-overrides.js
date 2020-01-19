@@ -17,5 +17,12 @@ module.exports = function override(config, env) {
             "react-dom": "preact/compat"
         }
     }
+    config.optimization.splitChunks = {
+        cacheGroups: {
+            default: false,
+        },
+    };
+
+    config.optimization.runtimeChunk = false;
     return rewireBabelLoader.include(config, resolveApp("../imagineui-core"))
 }

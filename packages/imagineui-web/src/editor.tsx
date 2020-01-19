@@ -115,8 +115,7 @@ const syntax = `
 </plist>
 `
 
-const en_landing =
-`Widescreen Page: Landing page
+const content = document.currentScript?.innerHTML || `Widescreen Page: Landing page
 Block: Navigation
     One row
     "ImagineUI"
@@ -142,62 +141,19 @@ Block: Description
     Header "DSL for mock-ups"
     "Open-source tool for low-fidelity mock-ups (wireframes) generation with a format that imitates natural speech."
 
-Block: Партнёры
+Block: Partners
     "In enterprises and in outsource, companies try ImagineUI"
     One row
     List of partners
-        consists of
-            Image partner logo
+    consists of
+    Image partner logo
 
 Blocks "Description", "Subscription" aligned in two columns
 
 // Format allows localized keywords like Gherkin
+
 // To try the Russian version, use the "Экран:"/"Страница:" keyword first
 // and consult the docs for the rest.
-//
-// imagineui.github.io
-`
-
-const ru_landing =
-`Широкоформатный Экран: Посадочная страница
-Блок: Навигация
-    Одна строка
-    "ImagineUI"
-    Кнопка Песочница
-    Кнопка Документация
-    Кнопка Партнёры
-    Кнопка Сообщество
-    Кнопка Подписаться
-
-Главный Блок: Подписка
-    Заголовок Подпишись на рассылку
-    Поле "полное имя"
-    Поле e-mail
-    Кнопка "Подписаться"
-    "или попробуй alpha-версию"
-    Два столбца
-    Кнопка Песочница
-    Кнопка CLI
-    Один столбец
-    "Подписавшись, вы принимаете Политику Приватности"
-
-Блок: Описание
-    Заголовок "DSL для макетов вёрстки"
-    "Open-source инструмент для генерации low-fidelity макетов по формату, имитирующему естественную речь"
-
-Блок: Партнёры
-    "В продуктовке и на outsource, компании внедряют ImagineUI"
-    Одна строка
-    Список тем
-        включает в себя
-            Картинка лого партнёра
-
-Блоки "Описание", "Подписка" расположены в два столбца 
-
-// Схема на русском языке для демонстрации заложенной возможности 
-// локализованных вариаций языка по типу Gherkin.
-// Чтобы попробовать английскую версию, используйте в начале ключевое слово "Page:"/"Screen:".
-// Для подробностей, обратитесь к документации.
 //
 // imagineui.github.io
 `
@@ -228,7 +184,7 @@ export async function liftOff(container: HTMLElement) {
     await wireTmGrammars(monaco, registry, grammars)
 
     return monaco.editor.create(container, {
-        value: en_landing,
+        value: content,
         language: 'imagineui_scene' // this won't work out of the box, see below for more info
     })
 }
@@ -239,7 +195,7 @@ export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentCha
         if(container.current) {
             liftOff(container.current).then(editor => {
                 editor.onDidChangeModelContent((ev) => onChange(ev, editor))
-                editor.getModel()!.setValue(en_landing)
+                editor.getModel()!.setValue(content)
             })
         }
     }, [container])
