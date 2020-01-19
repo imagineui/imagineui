@@ -10,7 +10,7 @@
     "imagineui": "yarn workspace imagineui-cli start",
     "dev-web": "yarn workspace imagineui-web start",
     "test": "test",
-    "postinstall": "yarn workspace imagine-cli build"
+    "postinstall": "yarn workspace imagineui-cli build"
   },
   "repository": {
     "type": "git",
