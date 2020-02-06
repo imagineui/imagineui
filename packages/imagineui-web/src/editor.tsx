@@ -74,7 +74,7 @@ const syntax = `
                     </dict>
                     <dict>
                         <key>begin</key>
-                        <string>(\\&quot;)</string>
+                        <string>[^\\x{005c}]""</string>
                         <key>beginCaptures</key>
                         <dict>
                             <key>1</key>
@@ -86,7 +86,31 @@ const syntax = `
                         <key>contentName</key>
                         <string>text.imagineui_scene</string>
                         <key>end</key>
-                        <string>(\\&quot;)</string>
+                        <string></string>
+                        <key>endCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                    </dict>
+                    <dict>
+                        <key>begin</key>
+                        <string>[^\\x{005c}]"</string>
+                        <key>beginCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                        <key>contentName</key>
+                        <string>text.imagineui_scene</string>
+                        <key>end</key>
+                        <string>[^\\x{005c}]"</string>
                         <key>endCaptures</key>
                         <dict>
                             <key>1</key>

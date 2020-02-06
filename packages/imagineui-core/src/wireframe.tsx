@@ -45,7 +45,7 @@ const Item = ({item, onHover}: {item: ParseItem, onHover?: (tokens: IToken[]) =>
     } else if(textEl) {
         const {StringLiteral, Variable} = textEl[0].children;
         if(StringLiteral)
-            text = StringLiteral[0].image.substring(1, StringLiteral[0].image.length-1)
+            text = StringLiteral[0].image.substring(1, StringLiteral[0].image.length-1).replace(/\\"/g, '"')
         if(Variable)
             text = '[WIP] Подстановки переменных'
     }
