@@ -9,6 +9,7 @@ import {Wireframe} from "imagineui-core/src/wireframe";
 import {parseSceneToAST} from "imagineui-core/src/parse/ast";
 import {initRussianNLP} from "imagineui-core/src/locales/ru_RU/nlp";
 import {fonts} from "./inlinedbalsamiq";
+import {getPageWidth} from "imagineui-core/src/guides/sizes";
 
 program
     .version('0.2.0', '-v, --version')
@@ -36,7 +37,7 @@ if (!ast.value) {
 const appDirectory = fs.realpathSync(process.cwd());
 const dictsPath = path.resolve(appDirectory, '../../node_modules/az/dicts')
 
-initRussianNLP(dictsPath).then(nlp => {
+initRussianNLP(dictsPath).then(async nlp => {
     modifyInitialState({
         nlp
     })
@@ -66,28 +67,32 @@ initRussianNLP(dictsPath).then(nlp => {
     </body>
 </html>
 `
+    let width : number | null = null;
+    const height = 600;
+    const padding = 16;
+    ast.value!.children.page.forEach(page => {
+        const newWidth = getPageWidth(page);
+        if(!width || (newWidth && width < newWidth))
+            width = newWidth;
+    });
 
-    puppeteer.launch().then(browser => {
-        browser.newPage().then(page => {
-            page.setContent(html).then(() => {
-                page.evaluateHandle('document.fonts.ready').then(() => {
-                    page.screenshot({
-                        type: 'png', fullPage: true
-                    }).then(result => {
-                        fs.writeFile(program.output, result, (err) => {
-                            if (err) {
-                                return console.log(err);
-                            }
-
-                            console.log('Render complete!');
-                            console.log(program.output);
-                        });
-                        browser.close()
-                    })
-                })
-            })
-        })
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    await page.setViewport({width: width ? (width + padding * 2) : 800, height})
+    await page.setContent(html)
+    await page.evaluateHandle('document.fonts.ready')
+    const result = await page.screenshot({
+        type: 'png', fullPage: true
     })
+    fs.writeFile(program.output, result, (err) => {
+        if (err) {
+            return console.log(err);
+        }
+
+        console.log('Render complete!');
+        console.log(program.output);
+    });
+    await browser.close()
 }).catch(error => {
     console.error(error)
     process.exit(1)

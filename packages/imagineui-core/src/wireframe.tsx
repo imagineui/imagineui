@@ -12,6 +12,7 @@ import {
 } from "./parse/ast";
 import {wireframeContext} from "./store";
 import {IToken} from "chevrotain";
+import {getPageWidth} from "./guides/sizes";
 
 interface WireframeProps {
     sceneDescription: ParseValue | null;
@@ -166,7 +167,7 @@ interface AlignRule {
 
 const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => {
 
-    const {Mobile, Tablet, Widescreen, block, blockalign} = page.children;
+    const {block, blockalign} = page.children;
 
     const mentions = new Map<string, AlignRule>()
     const placedMention = new Set<string>()
@@ -219,11 +220,7 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
             </div>)}
         </div>);
 
-    // TODO: [guide] Guidelines should be in
-    let width = 0;
-    if(Mobile) width = 320;
-    if(Tablet) width = 640;
-    if(Widescreen) width = 960;
+    const width = getPageWidth(page)
 
     if(width) {
         return <WiredCard>
