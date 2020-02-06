@@ -15,10 +15,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "outDir": "dist",
     "preserveSymlinks": true,
-    "composite": true
+    "composite": true,
+    "noEmit": true
   },
   "include": [
     "src"

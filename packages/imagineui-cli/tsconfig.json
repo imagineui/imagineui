@@ -22,11 +22,9 @@
     "composite": true
   },
   "include": [
-    "src",
-    "../../node_modules/wired-elements",
-    "../imagineui-core/*",
-    "../imagineui-core/*.ts",
-    "../imagineui-core/*.tsx",
-    "../imagineui-core"
+    "src"
+  ],
+  "references": [
+    {"path": "../imagineui-core"}
   ]
 }

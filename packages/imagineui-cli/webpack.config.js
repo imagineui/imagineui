@@ -14,9 +14,17 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [["@babel/preset-env", {
+                            "targets": { "node": "current" },
+                        }], "@babel/preset-typescript", "@babel/preset-react"]
+                    }
+                },
                 exclude: /node_modules/,
                 include: [
+                    resolveApp("./src"),
                     resolveApp("../imagineui-core")
                 ]
             }
@@ -27,5 +35,5 @@ module.exports = {
     },
     externals: {
         puppeteer: 'require("puppeteer")'
-    }
+    },
 }
