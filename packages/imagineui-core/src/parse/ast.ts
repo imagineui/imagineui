@@ -151,7 +151,7 @@ export interface ParseValue {
     name: 'scene'
 }
 
-interface ParseResult {
+export interface ParseResult {
     value?: ParseValue;
     lexTokens?: IToken[];
     lexErrors?: ILexingError[];
