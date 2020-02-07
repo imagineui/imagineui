@@ -1,7 +1,25 @@
 const fs = require("fs");
 const path = require("path");
+const spawn = require('child_process').spawn;
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const plugins = [];
+
+plugins.push({
+    apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
+            if(!fs.existsSync(resolveApp('./after-build.sh')))
+                return;
+            const child = spawn('sh', ['./after-build.sh']);
+            child.stdout.on('data', function (data) {
+                process.stdout.write(data);
+            });
+            child.stderr.on('data', function (data) {
+                process.stderr.write(data);
+            });
+        });
+    }
+});
 
 module.exports = {
     entry: "./src/app.tsx",
@@ -36,4 +54,5 @@ module.exports = {
     externals: {
         puppeteer: 'require("puppeteer")'
     },
+    plugins
 }
