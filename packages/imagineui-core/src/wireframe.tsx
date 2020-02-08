@@ -12,7 +12,7 @@ import {
 } from "./parse/ast";
 import {wireframeContext} from "./store";
 import {IToken} from "chevrotain";
-import {getPageWidth} from "./guides/sizes";
+import {getPageHeight, getPageWidth} from "./guides/sizes";
 
 interface WireframeProps {
     sceneDescription: ParseValue | null;
@@ -221,10 +221,11 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
         </div>);
 
     const width = getPageWidth(page)
+    const minHeight = getPageHeight(page) || 'unset'
 
     if(width) {
         return <WiredCard>
-            <div style={{width, overflow: 'hidden', alignItems: 'center'}}>
+            <div style={{width, minHeight, overflow: 'hidden', alignItems: 'center'}}>
                 {blocks}
             </div>
         </WiredCard>
