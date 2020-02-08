@@ -21,12 +21,10 @@ const keywords: KeywordDictionary = {
     mobile: ['mobile'],
     tablet: ['tablet', 'laptop'],
     widescreen: ['widescreen', 'desktop'],
-    with_scroll: ['with scroll'],
 
     block: ['block:'],
     blocks: ['blocks'],
     example: ['examples:'],
-    main: ['main'],
 
     header: ['header'],
     field: ['input', 'field'],
@@ -39,6 +37,12 @@ const keywords: KeywordDictionary = {
     with_icon: ['with an icon'],
     rows: ['rows', 'row'],
     columns: ['columns', 'column'],
+
+    top: ['top', 'above'],
+    bottom: ['bottom', 'below'],
+    left: ['left'],
+    right: ['right'],
+    center: ['center'],
 }
 const buildPatternFromWord = (word: string) => {
     const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`

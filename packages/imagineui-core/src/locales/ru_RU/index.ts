@@ -21,12 +21,10 @@ const keywords: KeywordDictionary = {
     mobile: ['мобильный', 'мобильная'],
     tablet: ['планшетный', 'планшетная', 'ноутбучный', 'ноутбучная'],
     widescreen: ['широкоформатный', 'широкоформатная'],
-    with_scroll: ['с прокруткой'],
 
     block: ['блок:'],
     blocks: ['блоки'],
     example: ['примеры:'],
-    main: ['главный'],
 
     header: ['заголовок'],
     field: ['поле ввода', 'поле'],
@@ -40,6 +38,12 @@ const keywords: KeywordDictionary = {
     with_icon: ['с иконкой'],
     rows: ['строка', 'строку', 'строчка', 'строчку', 'строки', 'строк', 'строкой', 'строчкой', 'строками', 'строчками'],
     columns: ['столбец', 'столбца', 'столбцов', 'столбцом'], // TODO: [lint] Auto-correction for plural inflections
+
+    top: ['верхний', 'сверху'],
+    bottom: ['нижний', 'сверху'],
+    left: ['левый', 'слева'],
+    right: ['правый', 'справа'],
+    center: ['по центру']
 }
 const buildPatternFromWord = (word: string) => {
     const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`

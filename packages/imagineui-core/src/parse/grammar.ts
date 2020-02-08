@@ -38,9 +38,10 @@ export class SceneParser extends Parser {
         const {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example, Main,
+            Example,
             Field, Button, Header, List, Image,
             Aligned, WithIcon, ConsistsOf,
+            Top, Bottom, Left, Right, Center,
             Rows, Columns,
         } = tokenSets.TokenSet;
 
@@ -82,22 +83,29 @@ export class SceneParser extends Parser {
             })
         });
 
+        // Top, Bottom, Left, Right, Center
         $.RULE("block", () => {
             $.OPTION(() => {
-                $.CONSUME(Main)
+                $.OR1([
+                    {ALT: () => $.CONSUME2(Top)},
+                    {ALT: () => $.CONSUME2(Bottom)},
+                    {ALT: () => $.CONSUME2(Left)},
+                    {ALT: () => $.CONSUME2(Right)},
+                    {ALT: () => $.CONSUME2(Center)},
+                ])
             });
             $.CONSUME(Block);
             $.SUBRULE($.value);
             $.CONSUME1(LineEnd);
             $.MANY1(() => {
-                $.OR1([
+                $.OR2([
                     {ALT: () => $.SUBRULE($.item)},
                     {ALT: () => $.SUBRULE($.list)},
                     {ALT: () => $.CONSUME2(LineEnd)}
                 ])
             });
             $.MANY2(() => {
-                $.OR2([
+                $.OR3([
                     {ALT: () => $.SUBRULE($.rows)},
                     {ALT: () => $.SUBRULE($.columns)},
                     {ALT: () => $.CONSUME3(LineEnd)}

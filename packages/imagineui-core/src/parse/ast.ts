@@ -111,7 +111,11 @@ export interface ParseRows {
 
 export interface ParseBlock {
     children: {
-        Main?: [IToken],
+        Top?: [IToken],
+        Bottom?: [IToken],
+        Left?: [IToken],
+        Right?: [IToken],
+        Center?: [IToken],
         Block: [IToken]
         value: ParseTextValue[]
         item?: ParseItem[]
@@ -200,16 +204,19 @@ export function parseSceneToAST(sceneText: string): ParseResult {
         const {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example, Main,
+            Example,
             Field, Button, Header, List, Image,
             Aligned, WithIcon, ConsistsOf,
             Rows, Columns,
+            Top, Bottom, Left, Right, Center
         } = tokenSets.TokenSet;
 
         const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example, Main, Comma, Colon, Field, Button, Header, List, Image, Aligned, Rows, Columns, WithIcon, ConsistsOf,
+            Example, Comma, Colon, Field, Button, Header, List, Image,
+            Aligned, Rows, Columns, WithIcon, ConsistsOf,
+            Top, Bottom, Left, Right, Center,
             ...Object.values(tokenSets.NumericTokenSet),
             NaturalLiteral];
 

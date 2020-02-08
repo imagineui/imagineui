@@ -29,12 +29,10 @@ export interface KeywordDictionary {
     mobile: string[];
     tablet: string[];
     widescreen: string[];
-    with_scroll: string[];
 
     block: string[];
     blocks: string[];
     example: string[];
-    main: string[];
 
     header: string[];
     field: string[];
@@ -48,6 +46,12 @@ export interface KeywordDictionary {
     aligned: string[];
     rows: string[];
     columns: string[];
+
+    top: string[];
+    bottom: string[];
+    left: string[];
+    right: string[];
+    center: string[];
 }
 
 export interface Dictionary {

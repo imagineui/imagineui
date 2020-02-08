@@ -18,7 +18,6 @@ export const buildTokensForLocale = (locale: Locale) => {
         Block: createToken({name: "Block", pattern: toRegex(dict.block)}),
         Blocks: createToken({name: "Blocks", pattern: toRegex(dict.blocks)}),
         Example: createToken({name: "Example", pattern: toRegex(dict.example)}),
-        Main: createToken({name: "Main", pattern: toRegex(dict.main)}),
         Field: createToken({name: "Field", pattern: toRegex(dict.field)}),
         Button: createToken({name: "Button", pattern: toRegex(dict.button)}),
         Header: createToken({name: "Header", pattern: toRegex(dict.header)}),
@@ -27,9 +26,13 @@ export const buildTokensForLocale = (locale: Locale) => {
         WithIcon: createToken({name: "WithIcon", pattern: toRegex(dict.with_icon)}),
         ConsistsOf: createToken({name: "ConsistsOf", pattern: toRegex(dict.consists_of)}),
         Aligned: createToken({name: "Aligned", pattern: toRegex(dict.aligned)}),
-        // In: createToken({name: "In", pattern: toRegex(dict.in)}),
         Rows: createToken({name: "Rows", pattern: toRegex(dict.rows)}),
         Columns: createToken({name: "Columns", pattern: toRegex(dict.columns)}),
+        Top: createToken({name: "Top", pattern: toRegex(dict.top)}),
+        Bottom: createToken({name: "Bottom", pattern: toRegex(dict.bottom)}),
+        Left: createToken({name: "Left", pattern: toRegex(dict.left)}),
+        Right: createToken({name: "Right", pattern: toRegex(dict.right)}),
+        Center: createToken({name: "Center", pattern: toRegex(dict.center)}),
     })
 
     const buildNumsSet = (dict: NumericDictionary) => ({
