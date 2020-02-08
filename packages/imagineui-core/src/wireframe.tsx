@@ -165,6 +165,15 @@ interface AlignRule {
     blocks: string[]
 }
 
+const ruleToFrames = (blockRefs: Map<string, ParseBlock>, onHover?: (tokens: IToken[]) => void) => (rule: AlignRule,i: number) =>
+    <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
+        {Array(rule.number).fill(0).map((_, i) =>
+            <div style={{display: 'flex', flex: 1, flexDirection: rule.name === 'rows' ? 'row' : 'column'}}>
+                {rule.blocks.filter((value, index) => index % rule.number == i)
+                    .map(block => <Block block={blockRefs.get(block)!} onHover={onHover}/>)}
+            </div>)}
+    </div>
+
 const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) => void}) => {
 
     const {block, blockalign} = page.children;
@@ -183,8 +192,11 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
 
     // const rules = block ? block.map(block => block.children.value.map(getTokenImage).join(', ')) : []
 
-    const rules: AlignRule[] = []
+    const topRules: AlignRule[] = []
+    const centerRules: AlignRule[] = []
+    const bottomRules: AlignRule[] = []
     const blockRefs = new Map<string, ParseBlock>();
+    const ruleRenderer = ruleToFrames(blockRefs, onHover)
 
     block?.forEach(ref => {
         const image = getTokenImage(ref.children.value[0])
@@ -195,6 +207,12 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
             return
 
         const rule = mentions.get(image);
+
+        const {Top, Center, Bottom} = ref.children;
+
+        let rules = topRules;
+        if(Center) rules = centerRules;
+        if(Bottom) rules = bottomRules;
 
         if(rule) {
             rules.push(rule)
@@ -211,27 +229,26 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
         placedMention.add(image)
     })
 
-    const blocks = rules.map((rule,i) =>
-        <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
-            {Array(rule.number).fill(0).map((_, i) =>
-                <div style={{display: 'flex', flex: 1, flexDirection: rule.name === 'rows' ? 'row' : 'column'}}>
-                {rule.blocks.filter((value, index) => index % rule.number == i)
-                    .map(block => <Block block={blockRefs.get(block)!} onHover={onHover}/>)}
-            </div>)}
-        </div>);
+    const topBlocks = topRules.map(ruleRenderer);
+    const centerBlocks = centerRules.map(ruleRenderer);
+    const bottomBlocks = bottomRules.map(ruleRenderer);
 
     const width = getPageWidth(page)
     const minHeight = getPageHeight(page) || 'unset'
 
     if(width) {
         return <WiredCard>
-            <div style={{width, minHeight, overflow: 'hidden', alignItems: 'center'}}>
-                {blocks}
+            <div style={{width, minHeight, overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
+                {topBlocks}
+                <div style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{centerBlocks}</div>
+                {bottomBlocks}
             </div>
         </WiredCard>
     } else {
         return <>
-            {blocks}
+            {topBlocks}
+            {centerBlocks}
+            {bottomBlocks}
         </>
     }
 }
