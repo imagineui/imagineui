@@ -237,7 +237,14 @@ const Page = ({page, onHover}: {page: ParsePage, onHover?: (tokens: IToken[]) =>
 }
 
 export const Wireframe = ({sceneDescription, className, onHover}: WireframeProps) => {
-    return <div className={className}>
+    let flexDirection = 'row'
+    sceneDescription?.children.page.forEach(({children}) => {
+        const {Mobile, Tablet, Widescreen} = children;
+        if(!Mobile && !Tablet && !Widescreen) {
+            flexDirection = 'column'
+        }
+    });
+    return <div className={className} style={{flexDirection}}>
         {sceneDescription && sceneDescription.children.page.map((page, i) => <>
             <Page page={page} onHover={onHover}/>
             {/*{i !== page.children.block.length - 1 ? <WiredDivider elevation={4}/> : null}*/}
