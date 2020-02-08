@@ -155,7 +155,7 @@ Block: Navigation
     Link to Community
     Link to Subscribe
 
-Main Block: Subscription
+Block: Subscription
     Header Subscribe to our newsletter
     Input "full name"
     Input e-mail
