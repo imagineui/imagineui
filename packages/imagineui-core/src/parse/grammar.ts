@@ -72,20 +72,14 @@ export class SceneParser extends Parser {
             // $.CONSUME(WhiteSpace);
             $.SUBRULE($.value);
             $.CONSUME1(LineEnd);
-            $.MANY1(() => {
+            $.MANY(() => {
                 $.OR2([
                     {ALT: () => $.SUBRULE($.block)},
                     {ALT: () => $.SUBRULE($.example)},
-                    {ALT: () => $.CONSUME2(LineEnd)}
+                    {ALT: () => $.CONSUME2(LineEnd)},
+                    {ALT: () => $.SUBRULE($.blockalign)}
                 ]);
             })
-            // $.SUBRULE($.blockalign)
-
-            // $.CONSUME(WhiteSpace);
-            $.MANY2(() => {
-                $.SUBRULE($.blockalign)
-            })
-
         });
 
         $.RULE("block", () => {
