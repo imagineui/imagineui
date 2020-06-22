@@ -12,7 +12,9 @@ To get involved you can also refer to the [thought process doc](https://imagineu
 ## Usage
 
 ### Editor
-https://imagineui.github.io
+Full demo: https://imagineui.github.io
+
+Latest core (`master` branch, used for CLI): https://imagineui.netlify.app/
 
 ### CLI
 We are in the process of packaging up ImagineUI as the CLI. 
@@ -24,5 +26,9 @@ npm install -g puppeteer
 git clone git@github.com:imagineui/imagineui.git
 cd imagineui
 yarn
-yarn start --input=%full-path-to-.scene% --output=%full-path-to-.png%
+yarn start --input=%full-path-to-.scene% --outputDir=%full-path-to-folder%
 ```
+Multiple --input paths are allowed for batch rendering (so that puppeteer only launches once)
+
+Caveats: 
+* On some systems `~` does not get substituted for `/home/%username%` yet
