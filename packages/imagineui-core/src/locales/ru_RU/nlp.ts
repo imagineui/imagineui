@@ -1,6 +1,6 @@
 // @ts-ignore  fixme: typings for Az and consistent API between forks
 import {default as Az} from 'az';
-import {NLProcessor} from "../../store";
+import {NLProcessor} from '../../store';
 
 function initAz(dictPath: string) {
     return new Promise(((resolve, reject) => {
@@ -23,11 +23,11 @@ export async function initRussianNLP(dictPath: string = 'https://unpkg.com/az@0.
         toNominativeCase(phrase: string): string {
             const tokens = phrase.split(' ')
 
-            if(prepositions.includes(tokens[0])) {
+            if (prepositions.includes(tokens[0])) {
                 tokens.shift()
             }
 
-            if(tokens.length < 1) {
+            if (tokens.length < 1) {
                 return phrase
             }
 
@@ -35,7 +35,7 @@ export async function initRussianNLP(dictPath: string = 'https://unpkg.com/az@0.
 
             tokens.forEach((token, index) => {
                 conjunctions.includes(token)
-                if(index && index < tokens.length - 1) {
+                if (index && index < tokens.length - 1) {
                     marks.push(index + 1)
                 }
             })
@@ -47,6 +47,6 @@ export async function initRussianNLP(dictPath: string = 'https://unpkg.com/az@0.
                 tokens[mark] = parsed ? parsed.normalize().word : tokens[mark];
             })
             return tokens.join(' ')
-        }
+        },
     }
 }

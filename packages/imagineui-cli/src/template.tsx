@@ -1,13 +1,8 @@
-import * as path from "path";
-import * as fs from "fs";
-import {fonts} from "./inlinedbalsamiq";
-import {render} from "preact-render-to-string";
+import {fonts} from './inlinedbalsamiq';
+import {render} from 'preact-render-to-string';
 
-const appDirectory = fs.realpathSync(process.cwd());
-const bundlePath = path.resolve(appDirectory, './build/render-bundle.js')
-const renderBundle = fs.readFileSync(bundlePath)
-const cssPath = path.resolve(appDirectory, '../imagineui-core/src/wireframe.css')
-const cssBundle = fs.readFileSync(cssPath)
+import renderBundle from '!!raw-loader!../build/render-bundle.js'
+import cssBundle from '!!raw-loader!../../imagineui-core/src/wireframe.css'
 
 export const renderWireframe = (component: preact.VNode) =>
     `<!DOCTYPE html>

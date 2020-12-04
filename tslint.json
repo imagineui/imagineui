@@ -9,7 +9,11 @@
     "no-console": [false],
     "object-literal-sort-keys": [false],
     "no-trailing-whitespace": [false],
-    "quotemark": [true, "single"]
+    "quotemark": [true, "single"],
+    "semicolon": false,
+    "ordered-imports": false,
+    "arrow-parens": false,
+    "curly": false
   },
   "rulesDirectory": []
 }

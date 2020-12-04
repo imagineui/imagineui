@@ -2,20 +2,23 @@ import {default as program} from 'commander';
 import * as puppeteer from 'puppeteer';
 import * as fs from 'fs';
 import * as path from 'path';
-import {modifyInitialState, StateProvider} from "imagineui-core/src/store";
-import React from "preact/compat";
-import {Wireframe} from "imagineui-core/src/wireframe";
-import {ParseResult, parseSceneToAST} from "imagineui-core/src/parse/ast";
-import {initRussianNLP} from "imagineui-core/src/locales/ru_RU/nlp";
-import {getPageWidth} from "imagineui-core/src/guides/sizes";
-import {renderWireframe} from "./template";
+import {modifyInitialState, StateProvider} from 'imagineui-core/src/store';
+import React from 'preact/compat';
+import {Wireframe} from 'imagineui-core/src/wireframe';
+import {ParseResult, parseSceneToAST} from 'imagineui-core/src/parse/ast';
+import {initRussianNLP} from 'imagineui-core/src/locales/ru_RU/nlp';
+import {getPageWidth} from 'imagineui-core/src/guides/sizes';
+import {renderWireframe} from './template';
+
+// tslint:disable-next-line:no-var-requires
+const {version: PACKAGE_VERSION} = require('../package.json')
 
 const collect = (value: string, previous: string[]) => previous.concat([value]);
 
 program
-    .version('0.2.0', '-v, --version')
+    .version(PACKAGE_VERSION, '-v, --version')
     .option('-i, --input <path>', 'source file (.scene)', collect, [])
-    .option('-d, --outputDir <path>', 'output path (format defined by renderer)')
+    .option('-d, --outputDir <path>', 'output path (format defined by renderer)', '.')
     // TODO: [cli] add support for fully qualified output names
     // .option('-o, --output <path>', 'output path (format defined by renderer)', collect, [])
     .option('-r, --renderer [type]', 'how should the scene be rendered [puppeteer]',
@@ -32,11 +35,11 @@ const sourceList = (program.input as string[]).map((inputPath: string) => {
     const scene = fs.readFileSync(inputPath, 'utf8')
     const ast = parseSceneToAST(scene + '\n')
 
-    if(ast.lexErrors) {
+    if (ast.lexErrors) {
         const firstError = ast.lexErrors[0]
         throw new Error(`${inputPath}\nCouldn\'t parse the input\n${firstError}`)
     }
-    if(ast.parseErrors) {
+    if (ast.parseErrors) {
         const firstError = ast.parseErrors[0]
         throw new Error(`${inputPath}\nCouldn\'t parse the input\n${firstError}`)
     }
@@ -51,32 +54,31 @@ const sourceList = (program.input as string[]).map((inputPath: string) => {
     return {
         ast,
         inputPath,
-        outputPath
+        outputPath,
     }
 })
 
-const appDirectory = fs.realpathSync(process.cwd());
-const dictsPath = path.resolve(appDirectory, '../../node_modules/az/dicts')
+// tslint:disable-next-line:no-eval
+const dictsPath = path.resolve(eval('require.resolve(\'./cli.js\')'), '../dicts')
 
 initRussianNLP(dictsPath).then(async nlp => {
     modifyInitialState({
-        nlp
+        nlp,
     })
 
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
 
-    for (let i = 0; i < sourceList.length; i++) {
-        const {ast, outputPath} = sourceList[i];
+    for (const {ast, outputPath} of sourceList) {
         const component = React.createElement(StateProvider, {},
             React.createElement(Wireframe, { sceneDescription: ast.value || null, className: 'wireframe'}))
 
-        let width : number | null = null;
+        let width: number | null = null;
         const height = 600;
         const padding = 16;
-        ast.value!.children.page.forEach(page => {
-            const newWidth = getPageWidth(page);
-            if(!width || (newWidth && width < newWidth))
+        ast.value!.children.page.forEach(screenPage => {
+            const newWidth = getPageWidth(screenPage);
+            if (!width || (newWidth && width < newWidth))
                 width = newWidth;
         });
 
@@ -84,7 +86,7 @@ initRussianNLP(dictsPath).then(async nlp => {
         await page.setContent(renderWireframe(component))
         await page.evaluateHandle('document.fonts.ready')
         const result = await page.screenshot({
-            type: 'png', fullPage: true
+            type: 'png', fullPage: true,
         })
         fs.writeFile(outputPath, result, (err) => {
             if (err) {
