@@ -17,18 +17,14 @@ Full demo: https://imagineui.github.io
 Latest core (`master` branch, used for CLI): https://imagineui.netlify.app/
 
 ### CLI
-We are in the process of packaging up ImagineUI as the CLI. 
-You can try the alpha version by pulling sources from GitHub.
+```bash
+npx imagineui-cli --input=%full-path-to-.scene% --outputDir=%full-path-to-folder%
 ```
-# You need to install Puppeteer globally first
-npm install -g puppeteer
-
-git clone git@github.com:imagineui/imagineui.git
-cd imagineui
-yarn
-yarn start --input=%full-path-to-.scene% --outputDir=%full-path-to-folder%
+Multiple --input paths are allowed for batch rendering (so that `puppeteer` only launches once)
+To speed up launching the `npx` command it is advised to install `imagineui-cli` globally, so that `puppeteer` is only downloaded once.
+```bash
+npm install -g imagineui-cli
 ```
-Multiple --input paths are allowed for batch rendering (so that puppeteer only launches once)
 
 Caveats: 
 * On some systems `~` does not get substituted for `/home/%username%` yet
