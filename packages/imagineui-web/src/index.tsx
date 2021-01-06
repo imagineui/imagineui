@@ -1,6 +1,6 @@
 import React, {render, useCallback, useState, useEffect, useContext} from 'preact/compat';
 import {Wireframe} from "imagineui-core/src/wireframe";
-import {parseSceneToAST, ParseValue} from "imagineui-core/src/parse/ast";
+import {parseSceneToAST, IUIScene} from "imagineui-core/src/parse/ast";
 import 'wired-elements';
 import './index.css';
 import "imagineui-core/src/fonts/balsamiqsans.css";
@@ -30,7 +30,7 @@ const Playground = () => {
         }).catch(console.error)
     }, [dispatch])
 
-    const [sceneAST, setSceneAST] = useState<ParseValue | null>(null)
+    const [sceneAST, setSceneAST] = useState<IUIScene | null>(null)
     const onChange = useCallback((ev: monaco.editor.IModelContentChangedEvent, editor: monaco.editor.IStandaloneCodeEditor) => {
         theEditor = editor
         // TODO: Consider incremental compilation with ev.changes to speed up the parsing/rendering

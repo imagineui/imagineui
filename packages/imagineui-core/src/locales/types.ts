@@ -1,7 +1,7 @@
 
 export enum Locale {
     ru_RU = 'ru_RU',
-    en_US = 'en_US'
+    en_US = 'en_US',
 }
 
 /**

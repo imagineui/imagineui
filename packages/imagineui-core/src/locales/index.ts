@@ -1,7 +1,9 @@
 import ru_RU from './ru_RU'
 import en_US from './en_US'
-import {Dictionary, Locale} from "./types";
+import {Dictionary, Locale} from './types';
+export * from './types'
 
+// TODO: Rework locale import/export to support Webpack tree-shaking
 export const localeDictionaries: localeDictionaries = {
     [Locale.ru_RU]: ru_RU,
     [Locale.en_US]: en_US,
@@ -20,7 +22,7 @@ export const detectLocale = (sceneText: string): Locale | null => {
         .sort((a, b) =>
             (a.score ?? Infinity) - (b.score ?? Infinity))[0]
 
-    if(winning.score !== undefined)
+    if (winning.score !== undefined)
         return winning.locale
 
     return null;

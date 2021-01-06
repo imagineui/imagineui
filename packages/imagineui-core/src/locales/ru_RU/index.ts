@@ -1,4 +1,4 @@
-import {Dictionary, KeywordDictionary, Locale, NumericDictionary} from "../types";
+import {Dictionary, KeywordDictionary, Locale, NumericDictionary} from '../types';
 
 const numbers: NumericDictionary = {
     zero: ['ноль', 'ноля', 'нолю'],
@@ -43,7 +43,7 @@ const keywords: KeywordDictionary = {
     bottom: ['нижний', 'сверху'],
     left: ['левый', 'слева'],
     right: ['правый', 'справа'],
-    center: ['по центру']
+    center: ['по центру'],
 }
 const buildPatternFromWord = (word: string) => {
     const caseInsensitive = `[${word[0].toUpperCase()}${word[0].toLowerCase()}]`
@@ -53,5 +53,5 @@ const buildPatternFromWord = (word: string) => {
 
 export default {
     locale: Locale.ru_RU,
-    numbers, keywords, buildPatternFromWord
+    numbers, keywords, buildPatternFromWord,
 } as Dictionary

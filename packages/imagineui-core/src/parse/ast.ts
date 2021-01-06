@@ -1,18 +1,18 @@
-import {SceneParser} from "./grammar";
-import {ILexingError, IRecognitionException, IToken, Lexer, TokenType} from "chevrotain";
-import {detectLocale} from "../locales";
-import {Dictionary, Locale} from "../locales/types";
-import {buildTokensForLocale} from "./tokens";
+import {SceneParser} from './grammar';
+import {ILexingError, IRecognitionException, IToken, Lexer, TokenType} from 'chevrotain';
+import {detectLocale} from '../locales';
+import {Dictionary, Locale} from '../locales/types';
+import {buildTokensForLocale} from './tokens';
 
-interface ParseText {
+interface IUIText {
     children: {
         StringLiteral: [IToken]
-        Variable: [IToken]
+        Variable: [IToken],
     }
     name: 'text'
 }
 
-interface ParseNumber {
+interface IUINumber {
     children: {
         NumberLiteral?: [IToken]
         Zero?: [IToken]
@@ -27,50 +27,50 @@ interface ParseNumber {
         Nine?: [IToken]
         Ten?: [IToken]
         Eleven?: [IToken]
-        Twelve?: [IToken]
+        Twelve?: [IToken],
     }
     name: 'number'
 }
 
-export const numberTokenToNumber = ({children}: ParseNumber) => {
-    if(children.NumberLiteral) {
+export const numberTokenToNumber = ({children}: IUINumber) => {
+    if (children.NumberLiteral) {
         return parseFloat(children.NumberLiteral[0].image)
     }
 
-    if(children.Zero) return 0;
-    if(children.One) return 1;
-    if(children.Two) return 2;
-    if(children.Three) return 3;
-    if(children.Four) return 4;
-    if(children.Five) return 5;
-    if(children.Six) return 6;
-    if(children.Seven) return 7;
-    if(children.Eight) return 8;
-    if(children.Nine) return 9;
-    if(children.Ten) return 10;
-    if(children.Eleven) return 11;
-    if(children.Twelve) return 12;
+    if (children.Zero) return 0;
+    if (children.One) return 1;
+    if (children.Two) return 2;
+    if (children.Three) return 3;
+    if (children.Four) return 4;
+    if (children.Five) return 5;
+    if (children.Six) return 6;
+    if (children.Seven) return 7;
+    if (children.Eight) return 8;
+    if (children.Nine) return 9;
+    if (children.Ten) return 10;
+    if (children.Eleven) return 11;
+    if (children.Twelve) return 12;
 
     throw new Error('Parsed number has no tokens')
 }
 
-export interface ParseTextValue {
+export interface IUITextValue {
     children: {
         NaturalLiteral: [IToken]
         StringLiteral: [IToken]
-        Variable: [IToken]
+        Variable: [IToken],
     }
     name: 'value'
 }
 
-export interface ParseItem {
+export interface IUIItem {
     children: {
         Button?: [IToken]
         Field?: [IToken]
         Image?: [IToken]
         Header?: [IToken]
-        value?: [ParseTextValue]
-        literal? : [ParseText]
+        value?: [IUITextValue]
+        literal?: [IUIText],
     }
     name: 'item'
 }
@@ -78,11 +78,11 @@ export interface ParseItem {
 export interface ParseBlockAlign {
     children: {
         Blocks: [IToken]
-        value: ParseTextValue[]
+        value: IUITextValue[]
         Aligned: [IToken]
-        number?: [ParseNumber]
+        number?: [IUINumber]
         Rows?: [IToken]
-        Columns?: [IToken]
+        Columns?: [IToken],
     }
     name: 'blockalign'
 }
@@ -90,10 +90,10 @@ export interface ParseBlockAlign {
 export interface ParseColumns {
     children: {
         In: [IToken]
-        number?: [ParseNumber]
+        number?: [IUINumber]
         Columns: [IToken]
-        item?: ParseItem[]
-        list?: ParseList[]
+        item?: IUIItem[]
+        list?: IUIList[],
     }
     name: 'columns'
 }
@@ -101,10 +101,10 @@ export interface ParseColumns {
 export interface ParseRows {
     children: {
         In: [IToken]
-        number?: [ParseNumber]
+        number?: [IUINumber]
         Rows: [IToken]
-        item?: ParseItem[]
-        list?: ParseList[]
+        item?: IUIItem[]
+        list?: IUIList[],
     }
     name: 'rows'
 }
@@ -117,24 +117,24 @@ export interface ParseBlock {
         Right?: [IToken],
         Center?: [IToken],
         Block: [IToken]
-        value: ParseTextValue[]
-        item?: ParseItem[]
-        list?: ParseList[]
+        value: IUITextValue[]
+        item?: IUIItem[]
+        list?: IUIList[]
         rows?: ParseRows[]
-        columns?: ParseColumns[]
+        columns?: ParseColumns[],
     }
     name: 'block'
 }
 
-export interface ParseList {
+export interface IUIList {
     children: {
         List: [IToken]
-        item?: ParseItem[]
+        item?: IUIItem[],
     }
     name: 'list'
 }
 
-export interface ParsePage {
+export interface IUIPage {
     children: {
         Mobile?: [IToken],
         Tablet?: [IToken],
@@ -143,20 +143,20 @@ export interface ParsePage {
         value: IToken[],
         block?: ParseBlock[],
         blockalign?: ParseBlockAlign[],
-        list: ParseList[]
+        list: IUIList[],
     }
     name: 'page'
 }
 
-export interface ParseValue {
+export interface IUIScene {
     children: {
-        page: ParsePage[]
+        page: IUIPage[],
     }
     name: 'scene'
 }
 
-export interface ParseResult {
-    value?: ParseValue;
+export interface IUIParseResult {
+    value?: IUIScene;
     lexTokens?: IToken[];
     lexErrors?: ILexingError[];
     parseErrors?: IRecognitionException[];
@@ -167,23 +167,23 @@ type localeParsersStorage = {
         tokenSets: ReturnType<typeof buildTokensForLocale>
         tokens: TokenType[]
         lexer: Lexer
-        parser: SceneParser
+        parser: SceneParser,
     }
 }
 
 const localeParsers: localeParsersStorage = {}
 
-export function parseSceneToAST(sceneText: string): ParseResult {
+export function parseSceneToAST(sceneText: string): IUIParseResult {
     const locale = detectLocale(sceneText)
-    if(!locale) {
+    if (!locale) {
         return {
             lexErrors: [{
                 line: 0,
                 column: 0,
                 offset: 0,
                 length: 10,
-                message: 'No locale detected. Please use one of the locale-specific keywords for .scene ("экран:", "screen:", etc.)'
-            }]
+                message: 'No locale detected. Please use one of the locale-specific keywords for .scene ("экран:", "screen:", etc.)',
+            }],
         }
     }
 
@@ -198,8 +198,8 @@ export function parseSceneToAST(sceneText: string): ParseResult {
             Colon} = tokenSets.CommonTokens;
 
         // TODO: [locales] Localize token names and error messages
-        Comma.LABEL = "','";
-        Colon.LABEL = "':'";
+        Comma.LABEL = '\',\'';
+        Colon.LABEL = '\':\'';
 
         const {
             Page, Mobile, Tablet, Widescreen,
@@ -208,7 +208,7 @@ export function parseSceneToAST(sceneText: string): ParseResult {
             Field, Button, Header, List, Image,
             Aligned, WithIcon, ConsistsOf,
             Rows, Columns,
-            Top, Bottom, Left, Right, Center
+            Top, Bottom, Left, Right, Center,
         } = tokenSets.TokenSet;
 
         const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
@@ -225,10 +225,11 @@ export function parseSceneToAST(sceneText: string): ParseResult {
             tokens,
             lexer: new Lexer(tokens, {
                 // Less position info tracked, reduces verbosity of the playground output.
-                positionTracking: "onlyStart", safeMode: true
-                // positionTracking: "onlyStart", skipValidations: true, ensureOptimizations: true TODO: enable optimizations
+                positionTracking: 'onlyStart', safeMode: true,
+                // positionTracking: "onlyStart", skipValidations: true, ensureOptimizations: true
+                // TODO: enable optimizations
             }),
-            parser: new SceneParser(tokenSets, tokens) // {outputCst:false}
+            parser: new SceneParser(tokenSets, tokens), // {outputCst:false}
         }
 
         localeParsers[locale] = storage;
@@ -239,7 +240,7 @@ export function parseSceneToAST(sceneText: string): ParseResult {
     const lexResult = lexer.tokenize(sceneText);
     if (lexResult.errors.length > 0) {
         return {
-            lexErrors: lexResult.errors
+            lexErrors: lexResult.errors,
         }
     }
 
@@ -256,7 +257,7 @@ export function parseSceneToAST(sceneText: string): ParseResult {
         }
     }
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
-        lexTokens: lexResult.tokens
+        value, // this is a pure grammar, the value will always be <undefined>
+        lexTokens: lexResult.tokens,
     };
 }

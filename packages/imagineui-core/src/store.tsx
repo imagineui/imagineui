@@ -1,7 +1,7 @@
-import * as React from "preact/compat";
+import * as React from 'react';
 
-import {createContext, useReducer} from "preact/compat";
-import {ComponentChildren} from "preact";
+import {createContext, useReducer} from 'react';
+import {ComponentChildren} from 'preact';
 
 export interface NLProcessor {
     locale: 'ru_RU'
@@ -25,7 +25,7 @@ export interface WireframeContext {
 }
 
 export enum WireframeActionTypes {
-    SET_NLP = 'SET_NLP', SET_VARIABLES = 'SET_VARIABLES'
+    SET_NLP = 'SET_NLP', SET_VARIABLES = 'SET_VARIABLES',
 }
 
 interface SetNlpAction {
@@ -41,18 +41,19 @@ type WireframeAction = SetNlpAction | SetVariablesAction
 
 export const wireframeContext = createContext<WireframeContext>({
     state: initialState,
-    dispatch: (action) => console.error('Reducer wasn\'t bound before action fired', action)
+    dispatch: (action) => console.error('Reducer wasn\'t bound before action fired', action),
 });
 
 const { Provider } = wireframeContext;
 
 export const StateProvider = ( { children }: {children?: ComponentChildren} ) => {
-    const [state, dispatch] = useReducer<WireframeState, WireframeAction>((state, action) => {
-        switch(action.type) {
+    // @ts-ignore
+    const [state, dispatch] = useReducer<WireframeState, WireframeAction>((curState, action) => {
+        switch (action.type) {
             case WireframeActionTypes.SET_NLP:
                 return {
-                    ...state,
-                    nlp: action.nlp
+                    ...curState,
+                    nlp: action.nlp,
                 };
             case WireframeActionTypes.SET_VARIABLES:
                 throw new Error('SET_VARIABLES Not implemented');

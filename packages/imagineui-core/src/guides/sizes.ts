@@ -1,21 +1,21 @@
-import {ParsePage} from "../parse/ast";
+import {IUIPage} from '../parse';
 
 // TODO: [guide] Guidelines should be pluggable (i.e. with SCSS variables)
-export const getPageWidth = (page: ParsePage) => {
+export const getPageWidth = (page: IUIPage) => {
     const {Mobile, Tablet, Widescreen} = page.children
 
-    if(Mobile) return 320;
-    if(Tablet) return 640;
-    if(Widescreen) return 960;
+    if (Mobile) return 320;
+    if (Tablet) return 640;
+    if (Widescreen) return 960;
     return null;
 }
 
 // assumed 16/9 ratio, mobile is vertical
-export const getPageHeight = (page: ParsePage) => {
+export const getPageHeight = (page: IUIPage) => {
     const {Mobile, Tablet, Widescreen} = page.children
 
-    if(Mobile) return 570;
-    if(Tablet) return 360;
-    if(Widescreen) return 540;
+    if (Mobile) return 570;
+    if (Tablet) return 360;
+    if (Widescreen) return 540;
     return null;
 }

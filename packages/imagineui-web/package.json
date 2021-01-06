@@ -25,6 +25,7 @@
     "monaco-editor-textmate": "^2.2.1",
     "monaco-textmate": "^3.0.1",
     "onigasm": "^2.2.4",
+    "preact": "^10.5.7",
     "react-scripts": "^3.3.0"
   },
   "eslintConfig": {

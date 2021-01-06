@@ -1,11 +1,16 @@
 // @ts-ignore  fixme: typings for Az and consistent API between forks
 import {default as Az} from 'az';
-import {NLProcessor} from '../../store';
+type Morph = any
+
+import {NLProcessor} from '../../store'
 
 function initAz(dictPath: string) {
     return new Promise(((resolve, reject) => {
         try {
-            Az.Morph.init(dictPath, resolve)
+            Az.Morph.init(dictPath, (err: any, result: Morph) => {
+                if (err) return reject(err)
+                resolve(result)
+            })
         } catch (e) {
             reject(e)
         }

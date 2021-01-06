@@ -1,22 +1,51 @@
 {
   "name": "imagineui-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "author": "vadkou",
   "license": "ISC",
+  "main": "dist/bundle.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --emitDeclarationOnly; webpack --config ./webpack.config.js"
+  },
   "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-react": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
+    "@babel/register": "^7.8.3",
     "@types/lodash": "^4.14.117",
     "@types/node": "^10.12.0",
+    "@types/react": "^17.0.0",
+    "babel-loader": "^8.0.6",
     "tslint": "^5.20.0",
-    "typescript": "3.7.3"
+    "typescript": "^4.1.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "dependencies": {
     "az": "OverDrive1g/Az.js#613872aa44be3a36f51102e32650f9f851639477",
     "chevrotain": "^6.5.0",
-    "preact": "^10.0.1",
+    "react": "^17.0.1",
+    "ts-loader": "^8.0.11",
     "wired-elements": "^2.0.0"
   },
   "peerDependencies": {
-    "az": "^0.2.3"
-  }
+    "az": "^0.2.3",
+    "react": "17.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wave909/imagineui.git"
+  },
+  "keywords": [
+    "cli",
+    "ui",
+    "ux"
+  ],
+  "bugs": {
+    "url": "https://github.com/wave909/imagineui/issues"
+  },
+  "homepage": "https://github.com/wave909/imagineui#readme"
 }

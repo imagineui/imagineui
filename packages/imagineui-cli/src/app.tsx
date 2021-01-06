@@ -5,7 +5,7 @@ import * as path from 'path';
 import {modifyInitialState, StateProvider} from 'imagineui-core/src/store';
 import React from 'preact/compat';
 import {Wireframe} from 'imagineui-core/src/wireframe';
-import {ParseResult, parseSceneToAST} from 'imagineui-core/src/parse/ast';
+import {IUIParseResult, parseSceneToAST} from 'imagineui-core/src/parse/ast';
 import {initRussianNLP} from 'imagineui-core/src/locales/ru_RU/nlp';
 import {getPageWidth} from 'imagineui-core/src/guides/sizes';
 import {renderWireframe} from './template';
@@ -26,7 +26,7 @@ program
     .parse(process.argv);
 
 interface Source {
-    ast: ParseResult
+    ast: IUIParseResult
     inputPath: string
     outputPath: string
 }

@@ -1,4 +1,4 @@
-import {Dictionary, KeywordDictionary, Locale, NumericDictionary} from "../types";
+import {Dictionary, KeywordDictionary, Locale, NumericDictionary} from '../types';
 
 const numbers: NumericDictionary = {
     zero: ['zero'],
@@ -52,5 +52,5 @@ const buildPatternFromWord = (word: string) => {
 
 export default {
     locale: Locale.en_US,
-    numbers, keywords, buildPatternFromWord
+    numbers, keywords, buildPatternFromWord,
 } as Dictionary

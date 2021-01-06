@@ -1,34 +1,33 @@
 import * as chevrotain from 'chevrotain';
-import {buildTokensForLocale} from "./tokens";
-import {TokenType} from "chevrotain";
+import {buildTokensForLocale} from './tokens';
+import {TokenType} from 'chevrotain';
 const Lexer = chevrotain.Lexer;
-
 
 // ----------------- parser -----------------
 const Parser = chevrotain.Parser;
 
 // TODO: [conformity] Test if the parsed AST conforms to the TypeScript types or generate TS types from the rules
 export class SceneParser extends Parser {
-    readonly scene!: () => any;
-    readonly page!: (idx: number) => any;
-    readonly block!: (idx: number) => any;
-    readonly row!: (idx: number) => any;
-    readonly column!: (idx: number) => any;
-    readonly rows!: (idx: number) => any;
-    readonly columns!: (idx: number) => any;
-    readonly example!: (idx: number) => any;
-    readonly exampleitem!: (idx: number) => any;
-    readonly item!: (idx: number) => any;
-    readonly value!: (idx: number) => any;
-    readonly list!: (idx: number) => any;
-    readonly comment!: (idx: number) => any;
-    readonly literal!: (idx: number) => any;
-    readonly number!: (idx: number) => any;
-    readonly blockalign!: (idx: number) => any;
+    private readonly scene!: () => any;
+    private readonly page!: (idx: number) => any;
+    private readonly block!: (idx: number) => any;
+    private readonly row!: (idx: number) => any;
+    private readonly column!: (idx: number) => any;
+    private readonly rows!: (idx: number) => any;
+    private readonly columns!: (idx: number) => any;
+    private readonly example!: (idx: number) => any;
+    private readonly exampleitem!: (idx: number) => any;
+    private readonly item!: (idx: number) => any;
+    private readonly value!: (idx: number) => any;
+    private readonly list!: (idx: number) => any;
+    private readonly comment!: (idx: number) => any;
+    private readonly literal!: (idx: number) => any;
+    private readonly number!: (idx: number) => any;
+    private readonly blockalign!: (idx: number) => any;
 
     constructor(tokenSets: ReturnType<typeof buildTokensForLocale>, tokens: TokenType[]) {
         super(tokens, {
-            recoveryEnabled: true
+            recoveryEnabled: true,
         })
 
         const {LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable, NaturalLiteral,
@@ -49,24 +48,24 @@ export class SceneParser extends Parser {
             Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve,
         } = tokenSets.NumericTokenSet;
 
-        const $ = this;
+        const $ = this as SceneParser;
 
-        $.RULE("scene", () => {
+        $.RULE('scene', () => {
             $.MANY(() => {
                 $.OR([
                     {ALT: () => $.SUBRULE($.page)},
                     {ALT: () => $.SUBRULE($.comment)},
-                    {ALT: () => $.CONSUME(LineEnd)}
+                    {ALT: () => $.CONSUME(LineEnd)},
                 ]);
             });
         });
 
-        $.RULE("page", () => {
+        $.RULE('page', () => {
             $.OPTION(() => {
                 $.OR1([
                     {ALT: () => $.CONSUME(Mobile)},
                     {ALT: () => $.CONSUME(Tablet)},
-                    {ALT: () => $.CONSUME(Widescreen)}
+                    {ALT: () => $.CONSUME(Widescreen)},
                 ]);
             });
             $.CONSUME(Page);
@@ -78,13 +77,13 @@ export class SceneParser extends Parser {
                     {ALT: () => $.SUBRULE($.block)},
                     {ALT: () => $.SUBRULE($.example)},
                     {ALT: () => $.CONSUME2(LineEnd)},
-                    {ALT: () => $.SUBRULE($.blockalign)}
+                    {ALT: () => $.SUBRULE($.blockalign)},
                 ]);
             })
         });
 
         // Top, Bottom, Left, Right, Center
-        $.RULE("block", () => {
+        $.RULE('block', () => {
             $.OPTION(() => {
                 $.OR1([
                     {ALT: () => $.CONSUME2(Top)},
@@ -101,19 +100,19 @@ export class SceneParser extends Parser {
                 $.OR2([
                     {ALT: () => $.SUBRULE($.item)},
                     {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)}
+                    {ALT: () => $.CONSUME2(LineEnd)},
                 ])
             });
             $.MANY2(() => {
                 $.OR3([
                     {ALT: () => $.SUBRULE($.rows)},
                     {ALT: () => $.SUBRULE($.columns)},
-                    {ALT: () => $.CONSUME3(LineEnd)}
+                    {ALT: () => $.CONSUME3(LineEnd)},
                     ])
             });
         });
 
-        $.RULE("rows", () => {
+        $.RULE('rows', () => {
             // $.CONSUME(In);
             $.OPTION(() => {
                 $.SUBRULE($.number);
@@ -124,12 +123,12 @@ export class SceneParser extends Parser {
                 $.OR([
                     {ALT: () => $.SUBRULE($.item)},
                     {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)}
+                    {ALT: () => $.CONSUME2(LineEnd)},
                 ])
             });
         });
 
-        $.RULE("columns", () => {
+        $.RULE('columns', () => {
             // $.CONSUME(In);
             $.OPTION(() => {
                 $.SUBRULE($.number);
@@ -140,17 +139,17 @@ export class SceneParser extends Parser {
                 $.OR([
                     {ALT: () => $.SUBRULE($.item)},
                     {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)}
+                    {ALT: () => $.CONSUME2(LineEnd)},
                 ])
             });
         });
 
-        $.RULE("blockalign", () => {
+        $.RULE('blockalign', () => {
             $.CONSUME(Blocks);
             $.MANY_SEP({
                 SEP: Comma, DEF: () => {
                     $.SUBRULE($.value);
-                }
+                },
             });
             $.CONSUME(Aligned);
             // $.CONSUME(In);
@@ -159,19 +158,19 @@ export class SceneParser extends Parser {
             });
             $.OR([
                 {ALT: () => $.CONSUME(Rows)},
-                {ALT: () => $.CONSUME(Columns)}
+                {ALT: () => $.CONSUME(Columns)},
             ])
             $.CONSUME(LineEnd);
         });
 
-        $.RULE("item", () => {
+        $.RULE('item', () => {
             $.OR1([
                 {ALT: () => {
                     $.OR2([
                             {ALT: () => $.CONSUME(Field)},
                             {ALT: () => $.CONSUME(Button)},
                             {ALT: () => $.CONSUME(Header)},
-                            {ALT: () => $.CONSUME(Image)}
+                            {ALT: () => $.CONSUME(Image)},
                         ]);
                     $.OPTION(() => $.SUBRULE($.value))
                     }},
@@ -180,7 +179,7 @@ export class SceneParser extends Parser {
             $.CONSUME(LineEnd);
         });
 
-        $.RULE("example", () => {
+        $.RULE('example', () => {
             $.CONSUME(Example);
             $.CONSUME(LineEnd);
             $.MANY(() => {
@@ -188,7 +187,7 @@ export class SceneParser extends Parser {
             });
         });
 
-        $.RULE("exampleitem", () => {
+        $.RULE('exampleitem', () => {
             $.OR([
                 {ALT: () => $.CONSUME(Field)},
                 {ALT: () => $.CONSUME(Button)},
@@ -200,12 +199,12 @@ export class SceneParser extends Parser {
             $.MANY_SEP({
               SEP: Comma, DEF: () => {
                 $.SUBRULE($.value);
-              }
+              },
             });
             $.CONSUME(LineEnd);
         });
 
-        $.RULE("list", () => {
+        $.RULE('list', () => {
             $.CONSUME(List);
             $.OPTION2(() => {
                 $.SUBRULE1($.value);
@@ -218,14 +217,14 @@ export class SceneParser extends Parser {
             });
         });
 
-        $.RULE("literal", () => {
+        $.RULE('literal', () => {
             $.OR([
                 {ALT: () => $.CONSUME(StringLiteral)},
                 {ALT: () => $.CONSUME(Variable)},
             ]);
         });
 
-        $.RULE("number", () => {
+        $.RULE('number', () => {
             $.OR([
                 {ALT: () => $.CONSUME(NumberLiteral)},
                 {ALT: () => $.CONSUME(Zero)},
@@ -244,16 +243,16 @@ export class SceneParser extends Parser {
             ]);
         })
 
-        $.RULE("value", () => {
+        $.RULE('value', () => {
             $.OR([
                 {ALT: () => $.CONSUME(StringLiteral)},
-                //{ALT: () => $.CONSUME(NumberLiteral)},
+                // {ALT: () => $.CONSUME(NumberLiteral)},
                 {ALT: () => $.CONSUME(Variable)},
                 {ALT: () => $.CONSUME(NaturalLiteral)},
             ]);
         });
 
-        $.RULE("comment", () => {
+        $.RULE('comment', () => {
             $.CONSUME(Comment);
             $.OPTION(() => $.CONSUME(LineEnd))
         })

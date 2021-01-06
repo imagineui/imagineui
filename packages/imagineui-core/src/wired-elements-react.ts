@@ -1,5 +1,5 @@
-import * as React from "preact/compat";
-import {ClassAttributes, ComponentChildren} from "preact";
+import * as React from 'react';
+import {ClassAttributes, ComponentChildren} from 'preact';
 
 /**
  * Soft fork of https://github.com/SammyLiang97/react-wired-element
@@ -25,17 +25,18 @@ type WIRED_ELEMENT_LIST =
     'wired-tooltip'
     ;
 
-
-const wiredComponentCreator = <P>(element: WIRED_ELEMENT_LIST) => (props: P & { children?: ComponentChildren } & { [key: string]: any }) => React.createElement<ClassAttributes<P>>(
+const wiredComponentCreator = <P>(element: WIRED_ELEMENT_LIST) =>
 // @ts-ignore
+    (props: P & { children?: ComponentChildren } & { [key: string]: any }) => React.createElement<ClassAttributes<P>>(
     element,
     props,
-    props.children
+    props.children,
 );
 
 export const WiredCard = wiredComponentCreator<{ elevation?: number, fill?: string }>('wired-card');
 
-export const WiredCombo = wiredComponentCreator<{ value?: object, selected?: string, disabled?: boolean }>('wired-combo');
+export const WiredCombo =
+    wiredComponentCreator<{ value?: object, selected?: string, disabled?: boolean }>('wired-combo');
 
 export const WiredDivider = wiredComponentCreator<{elevation?: number}>('wired-divider');
 
@@ -60,7 +61,7 @@ export const WiredInput = wiredComponentCreator<{
     size?: number,
     autocapitalize?: string,
     autocorrect?: string,
-    value?: string
+    value?: string,
 }>('wired-input');
 
 export const WiredButton = wiredComponentCreator<{ elevation?: number, disabled?: boolean }>('wired-button');
@@ -71,13 +72,17 @@ export const WiredIconButton = wiredComponentCreator<{ disabled?: boolean }>('wi
 
 export const WiredListbox = wiredComponentCreator<{ value?: object, selected?: boolean, horizontal?: boolean }>('wired-listbox');
 
-export const WiredProgress = wiredComponentCreator<{ value?: number, min?: number, max?: number, percentage?: boolean }>('wired-progress');
+export const WiredProgress =
+    wiredComponentCreator<{ value?: number, min?: number, max?: number, percentage?: boolean }>('wired-progress');
 
-export const WiredRadio = wiredComponentCreator<{ checked?: boolean, name?: string, text?: string, iconsize?: number, disabled?: boolean }>('wired-radio');
+export const WiredRadio =
+    wiredComponentCreator<{ checked?: boolean, name?: string, text?: string, iconsize?: number, disabled?: boolean }>('wired-radio');
 
-export const WiredRadioGroup = wiredComponentCreator<{ selected?: string }>('wired-radio-group');
+export const WiredRadioGroup =
+    wiredComponentCreator<{ selected?: string }>('wired-radio-group');
 
-export const WiredSlider = wiredComponentCreator<{ value?: number, min?: number, max?: number, knobradius?: number, disabled?: boolean }>('wired-slider');
+export const WiredSlider =
+    wiredComponentCreator<{ value?: number, min?: number, max?: number, knobradius?: number, disabled?: boolean }>('wired-slider');
 
 export const WiredTextarea = wiredComponentCreator<{
     rows?: number,
@@ -90,7 +95,7 @@ export const WiredTextarea = wiredComponentCreator<{
     required?: boolean,
     minlength?: number,
     maxlength?: number,
-    disabled?: boolean
+    disabled?: boolean,
 }>('wired-textarea');
 
 export const WiredToggle = wiredComponentCreator<{ checked?: boolean, disabled?: boolean }>('wired-toggle');

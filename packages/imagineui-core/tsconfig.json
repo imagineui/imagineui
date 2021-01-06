@@ -11,17 +11,23 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
     "isolatedModules": true,
-    "outDir": "dist",
+    "rootDir": "./src/",
+    "outDir": "./dist/",
     "preserveSymlinks": true,
     "composite": true,
-    "noEmit": true
+    "sourceMap": true,
+    "noEmit": false
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
