@@ -57,7 +57,7 @@ export const buildTokensForLocale = (locale: Locale) => {
             group: Lexer.SKIPPED,
         }),
         StringLiteral: createToken({
-            name: 'StringLiteral', pattern: /"(?:[^\n\r"\\]|\\.)*"/,
+            name: 'StringLiteral', pattern: /["«»](?:[^\n\r"\\]|\\.)*["«»]/,
         }),
         Variable: createToken({
             name: 'Variable', pattern: /<(?:[^\n\r"\\]|\\.)*>/,
