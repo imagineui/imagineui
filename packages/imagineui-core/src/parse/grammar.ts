@@ -38,7 +38,7 @@ export class SceneParser extends Parser {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
             Example,
-            Field, Button, Header, List, Image,
+            Field, Button, Header, List, Image, Space,
             Aligned, WithIcon, ConsistsOf,
             Top, Bottom, Left, Right, Center,
             Rows, Columns,
@@ -171,6 +171,7 @@ export class SceneParser extends Parser {
                             {ALT: () => $.CONSUME(Button)},
                             {ALT: () => $.CONSUME(Header)},
                             {ALT: () => $.CONSUME(Image)},
+                            {ALT: () => $.CONSUME(Space)},
                         ]);
                     $.OPTION(() => $.SUBRULE($.value))
                     }},
@@ -193,6 +194,7 @@ export class SceneParser extends Parser {
                 {ALT: () => $.CONSUME(Button)},
                 {ALT: () => $.CONSUME(Header)},
                 {ALT: () => $.CONSUME(Image)},
+                {ALT: () => $.CONSUME(Space)},
                 {ALT: () => $.CONSUME(Variable)},
             ]);
             $.CONSUME(Colon);

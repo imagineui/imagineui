@@ -31,6 +31,7 @@ const keywords: KeywordDictionary = {
     button: ['кнопка', 'ссылка'],
     list: ['список'],
     image: ['картинка'],
+    space: ['пустота', 'пустое пространство'],
 
     consists_of: ['включает в себя'],
     aligned: ['расположены в', 'расположены'],

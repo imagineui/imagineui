@@ -39,6 +39,7 @@ export interface KeywordDictionary {
     button: string[];
     list: string[];
     image: string[];
+    space: string[];
 
     consists_of: string[];
     with_icon: string[];

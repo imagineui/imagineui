@@ -31,6 +31,7 @@ const keywords: KeywordDictionary = {
     button: ['button', 'link to', 'link'],
     list: ['list'],
     image: ['image'],
+    space: ['space', 'empty space'],
 
     consists_of: ['consists of'],
     aligned: ['aligned in', 'aligned'],

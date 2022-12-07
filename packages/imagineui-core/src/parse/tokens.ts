@@ -22,6 +22,7 @@ export const buildTokensForLocale = (locale: Locale) => {
         Header: createToken({name: 'Header', pattern: toRegex(dict.header)}),
         List: createToken({name: 'List', pattern: toRegex(dict.list)}),
         Image: createToken({name: 'Image', pattern: toRegex(dict.image)}),
+        Space: createToken({name: 'Space', pattern: toRegex(dict.space)}),
         WithIcon: createToken({name: 'WithIcon', pattern: toRegex(dict.with_icon)}),
         ConsistsOf: createToken({name: 'ConsistsOf', pattern: toRegex(dict.consists_of)}),
         Aligned: createToken({name: 'Aligned', pattern: toRegex(dict.aligned)}),

@@ -33,7 +33,7 @@ const getTokenImage = (literal: IUITextValue) => {
 }
 
 const Item = ({item, onHover}: {item: IUIItem, onHover?: (tokens: IToken[]) => void}) => {
-    const {Button, Field, Image, Header, value, literal} = item.children;
+    const {Button, Field, Image, Header, Space, value, literal} = item.children;
 
     const {state} = useContext(wireframeContext!);
     const {toNominativeCase} = state.nlp || {};
@@ -61,6 +61,10 @@ const Item = ({item, onHover}: {item: IUIItem, onHover?: (tokens: IToken[]) => v
 
     const elProps = {
         onMouseEnter, onMouseLeave,
+    }
+
+    if (Space) {
+        return <div style={{flex: 1}}/>
     }
 
     if (Button) {

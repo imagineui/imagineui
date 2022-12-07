@@ -68,6 +68,7 @@ export interface IUIItem {
         Button?: [IToken]
         Field?: [IToken]
         Image?: [IToken]
+        Space?: [IToken]
         Header?: [IToken]
         value?: [IUITextValue]
         literal?: [IUIText],
@@ -205,7 +206,7 @@ export function parseSceneToAST(sceneText: string): IUIParseResult {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
             Example,
-            Field, Button, Header, List, Image,
+            Field, Button, Header, List, Image, Space,
             Aligned, WithIcon, ConsistsOf,
             Rows, Columns,
             Top, Bottom, Left, Right, Center,
@@ -214,7 +215,7 @@ export function parseSceneToAST(sceneText: string): IUIParseResult {
         const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example, Comma, Colon, Field, Button, Header, List, Image,
+            Example, Comma, Colon, Field, Button, Header, List, Image, Space,
             Aligned, Rows, Columns, WithIcon, ConsistsOf,
             Top, Bottom, Left, Right, Center,
             ...Object.values(tokenSets.NumericTokenSet),
