@@ -1,9 +1,9 @@
 import React, {useEffect, useRef} from 'preact/compat'
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import {buildRegexFromWords, localeDictionaries} from "imagineui-core/src/locales";
+import {buildRegexFromWords, localeDictionaries} from 'imagineui-core/src/locales';
 
 export const KEYWORDS_PATTERN = Object.values(localeDictionaries)
     .map(dicts => Object.values(dicts.keywords).map((keyword) =>
@@ -191,21 +191,21 @@ Blocks "Description", "Subscription" aligned in two columns
 export async function liftOff(container: HTMLElement) {
     await loadWASM('https://unpkg.com/onigasm@2.2.4/lib/onigasm.wasm')
 
-    monaco.languages.register({ id: "imagineui_scene" });
+    monaco.languages.register({ id: 'imagineui_scene' });
     const registry = new Registry({
         getGrammarDefinition: async (scopeName) => {
             if (scopeName === 'source.imagineui_scene') {
                 return {
                     format: 'plist',
-                    content: syntax
+                    content: syntax,
                 }
             } else {
                 return {
                     format: 'plist',
-                    content: syntax
+                    content: syntax,
                 }
             }
-        }
+        },
     })
 
     const grammars = new Map()
@@ -215,14 +215,16 @@ export async function liftOff(container: HTMLElement) {
 
     return monaco.editor.create(container, {
         value: content,
-        language: 'imagineui_scene' // this won't work out of the box, see below for more info
+        language: 'imagineui_scene', // this won't work out of the box, see below for more info
     })
 }
 
-export const Editor = ({onChange}: {onChange: (e: monaco.editor.IModelContentChangedEvent, editor: monaco.editor.IStandaloneCodeEditor) => void}) => {
+export const Editor = ({onChange}:
+                         { onChange: (e: monaco.editor.IModelContentChangedEvent,
+                                      editor: monaco.editor.IStandaloneCodeEditor) => void}) => {
     const container = useRef<HTMLDivElement>()
     useEffect(() => {
-        if(container.current) {
+        if (container.current) {
             liftOff(container.current).then(editor => {
                 editor.onDidChangeModelContent((ev) => onChange(ev, editor))
                 editor.getModel()!.setValue(content)

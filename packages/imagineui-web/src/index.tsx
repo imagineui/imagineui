@@ -1,16 +1,16 @@
 import React, {render, useCallback, useState, useEffect, useContext} from 'preact/compat';
-import {Wireframe} from "imagineui-core/src/wireframe";
-import {parseSceneToAST, IUIScene} from "imagineui-core/src/parse/ast";
+import {Wireframe} from 'imagineui-core/src/wireframe';
+import {parseSceneToAST, IUIScene} from 'imagineui-core/src/parse/ast';
 import 'wired-elements';
 import './index.css';
-import "imagineui-core/src/fonts/balsamiqsans.css";
+import 'imagineui-core/src/fonts/balsamiqsans.css';
 import 'imagineui-core/src/wireframe.css';
-import {Editor} from "./editor";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
-import {MarkerSeverity} from "monaco-editor";
-import {StateProvider, WireframeActionTypes, wireframeContext} from "imagineui-core/src/store";
-import {initRussianNLP} from "imagineui-core/src/locales/ru_RU/nlp";
-import {IToken} from "chevrotain";
+import {Editor} from './editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import {MarkerSeverity} from 'monaco-editor';
+import {StateProvider, WireframeActionTypes, wireframeContext} from 'imagineui-core/src/store';
+import {initRussianNLP} from 'imagineui-core/src/locales/ru_RU/nlp';
+import {IToken} from 'chevrotain';
 
 let theEditor: monaco.editor.IStandaloneCodeEditor | null = null;
 let oldDecorations: string[] = []
@@ -38,7 +38,7 @@ const Playground = () => {
         try {
             const ast = parseSceneToAST(editor.getValue() + '\n')
 
-            if(ast.lexErrors) {
+            if (ast.lexErrors) {
                 monaco.editor.setModelMarkers(editor.getModel()!, 'imagineui', ast.lexErrors.map((error) => ({
                     severity: MarkerSeverity.Error,
                     message: error.message,
@@ -48,7 +48,7 @@ const Playground = () => {
                     endColumn: error.column || 0,
                 })))
             }
-            if(ast.parseErrors) {
+            if (ast.parseErrors) {
                 monaco.editor.setModelMarkers(editor.getModel()!, 'imagineui', ast.parseErrors.map((error) => ({
                     severity: MarkerSeverity.Error,
                     message: error.message,
@@ -69,16 +69,16 @@ const Playground = () => {
         oldDecorations = theEditor && theEditor.deltaDecorations(oldDecorations, tokens.map((token): monaco.editor.IModelDeltaDecoration => ({
             range: tokenRange(token),
             options: {
-                className: `token token__${token.tokenType.name}`
-            }
+                className: `token token__${token.tokenType.name}`,
+            },
         }))) || []
     }, [])
 
-    return <div className="sandbox__view">
-        <div className="sandbox__input">
+    return <div className='sandbox__view'>
+        <div className='sandbox__input'>
             <Editor onChange={onChange}/>
         </div>
-        <Wireframe className="wireframe" sceneDescription={sceneAST} onHover={onHover}/>
+        <Wireframe className='wireframe' sceneDescription={sceneAST} onHover={onHover}/>
     </div>
 }
 
