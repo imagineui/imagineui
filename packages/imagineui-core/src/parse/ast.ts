@@ -88,26 +88,20 @@ export interface ParseBlockAlign {
     name: 'blockalign'
 }
 
-export interface ParseColumns {
+export interface ParseDirection {
     children: {
         In: [IToken]
         number?: [IUINumber]
-        Columns: [IToken]
         item?: IUIItem[]
         list?: IUIList[],
-    }
-    name: 'columns'
-}
-
-export interface ParseRows {
-    children: {
-        In: [IToken]
-        number?: [IUINumber]
-        Rows: [IToken]
-        item?: IUIItem[]
-        list?: IUIList[],
-    }
-    name: 'rows'
+    } & ({
+        Rows: [IToken],
+        Columns?: never,
+    } | {
+        Rows?: never,
+        Columns: [IToken],
+    })
+    name: 'direction'
 }
 
 export interface ParseBlock {
@@ -121,8 +115,7 @@ export interface ParseBlock {
         value: IUITextValue[]
         item?: IUIItem[]
         list?: IUIList[]
-        rows?: ParseRows[]
-        columns?: ParseColumns[],
+        direction?: ParseDirection[],
     }
     name: 'block'
 }
@@ -205,7 +198,6 @@ export function parseSceneToAST(sceneText: string): IUIParseResult {
         const {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example,
             Field, Button, Header, List, Image, Space,
             Aligned, WithIcon, ConsistsOf,
             Rows, Columns,
@@ -215,7 +207,7 @@ export function parseSceneToAST(sceneText: string): IUIParseResult {
         const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example, Comma, Colon, Field, Button, Header, List, Image, Space,
+            Comma, Colon, Field, Button, Header, List, Image, Space,
             Aligned, Rows, Columns, WithIcon, ConsistsOf,
             Top, Bottom, Left, Right, Center,
             ...Object.values(tokenSets.NumericTokenSet),

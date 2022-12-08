@@ -14,7 +14,7 @@ export const buildRegexFromWords = (words: string[], buildPatternFromWord: (word
 
 const testers = new Map(Object.values(Locale)
     .map(locale => localeDictionaries[locale])
-    .map(dict => [dict.locale, buildRegexFromWords(dict.keywords.page, dict.buildPatternFromWord)]))
+    .map(dict => [dict.locale, buildRegexFromWords(dict.keywords.Page, dict.buildPatternFromWord)]))
 
 export const detectLocale = (sceneText: string): Locale | null => {
     const winning = [...testers]

@@ -11,12 +11,7 @@ export class SceneParser extends Parser {
     private readonly scene!: () => any;
     private readonly page!: (idx: number) => any;
     private readonly block!: (idx: number) => any;
-    private readonly row!: (idx: number) => any;
-    private readonly column!: (idx: number) => any;
-    private readonly rows!: (idx: number) => any;
-    private readonly columns!: (idx: number) => any;
-    private readonly example!: (idx: number) => any;
-    private readonly exampleitem!: (idx: number) => any;
+    private readonly direction!: (idx: number) => any;
     private readonly item!: (idx: number) => any;
     private readonly value!: (idx: number) => any;
     private readonly list!: (idx: number) => any;
@@ -37,7 +32,6 @@ export class SceneParser extends Parser {
         const {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Example,
             Field, Button, Header, List, Image, Space,
             Aligned, WithIcon, ConsistsOf,
             Top, Bottom, Left, Right, Center,
@@ -75,13 +69,17 @@ export class SceneParser extends Parser {
             $.MANY(() => {
                 $.OR2([
                     {ALT: () => $.SUBRULE($.block)},
-                    {ALT: () => $.SUBRULE($.example)},
                     {ALT: () => $.CONSUME2(LineEnd)},
                     {ALT: () => $.SUBRULE($.blockalign)},
                 ]);
             })
         });
 
+        const BLOCK_CONTENT = () => [
+            {ALT: () => $.SUBRULE($.item)},
+            {ALT: () => $.SUBRULE($.list)},
+            {ALT: () => $.CONSUME2(LineEnd)},
+        ]
         // Top, Bottom, Left, Right, Center
         $.RULE('block', () => {
             $.OPTION(() => {
@@ -97,50 +95,28 @@ export class SceneParser extends Parser {
             $.SUBRULE($.value);
             $.CONSUME1(LineEnd);
             $.MANY1(() => {
-                $.OR2([
-                    {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)},
-                ])
+                $.OR2(BLOCK_CONTENT())
             });
             $.MANY2(() => {
                 $.OR3([
-                    {ALT: () => $.SUBRULE($.rows)},
-                    {ALT: () => $.SUBRULE($.columns)},
+                    {ALT: () => $.SUBRULE($.direction)},
                     {ALT: () => $.CONSUME3(LineEnd)},
                     ])
             });
         });
 
-        $.RULE('rows', () => {
+        $.RULE('direction', () => {
             // $.CONSUME(In);
             $.OPTION(() => {
                 $.SUBRULE($.number);
             });
-            $.CONSUME(Rows);
+            $.OR([
+                {ALT: () => $.CONSUME(Rows)},
+                {ALT: () => $.CONSUME(Columns)},
+            ]);
             $.CONSUME1(LineEnd);
             $.MANY(() => {
-                $.OR([
-                    {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)},
-                ])
-            });
-        });
-
-        $.RULE('columns', () => {
-            // $.CONSUME(In);
-            $.OPTION(() => {
-                $.SUBRULE($.number);
-            })
-            $.CONSUME(Columns);
-            $.CONSUME1(LineEnd);
-            $.MANY(() => {
-                $.OR([
-                    {ALT: () => $.SUBRULE($.item)},
-                    {ALT: () => $.SUBRULE($.list)},
-                    {ALT: () => $.CONSUME2(LineEnd)},
-                ])
+                $.OR2(BLOCK_CONTENT())
             });
         });
 
@@ -177,32 +153,6 @@ export class SceneParser extends Parser {
                     }},
                 {ALT: () => $.SUBRULE($.literal)},
             ]);
-            $.CONSUME(LineEnd);
-        });
-
-        $.RULE('example', () => {
-            $.CONSUME(Example);
-            $.CONSUME(LineEnd);
-            $.MANY(() => {
-                $.SUBRULE($.exampleitem);
-            });
-        });
-
-        $.RULE('exampleitem', () => {
-            $.OR([
-                {ALT: () => $.CONSUME(Field)},
-                {ALT: () => $.CONSUME(Button)},
-                {ALT: () => $.CONSUME(Header)},
-                {ALT: () => $.CONSUME(Image)},
-                {ALT: () => $.CONSUME(Space)},
-                {ALT: () => $.CONSUME(Variable)},
-            ]);
-            $.CONSUME(Colon);
-            $.MANY_SEP({
-              SEP: Comma, DEF: () => {
-                $.SUBRULE($.value);
-              },
-            });
             $.CONSUME(LineEnd);
         });
 

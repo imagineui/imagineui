@@ -9,50 +9,49 @@ export enum Locale {
  * TODO: Consider parsing all numerals
  */
 export interface NumericDictionary {
-    zero: string[];
-    one: string[];
-    two: string[];
-    three: string[];
-    four: string[];
-    five: string[];
-    six: string[];
-    seven: string[];
-    eight: string[];
-    nine: string[];
-    ten: string[];
-    eleven: string[];
-    twelve: string[];
+    Zero: string[];
+    One: string[];
+    Two: string[];
+    Three: string[];
+    Four: string[];
+    Five: string[];
+    Six: string[];
+    Seven: string[];
+    Eight: string[];
+    Nine: string[];
+    Ten: string[];
+    Eleven: string[];
+    Twelve: string[];
 }
 
 export interface KeywordDictionary {
-    page: string[];
-    mobile: string[];
-    tablet: string[];
-    widescreen: string[];
+    Page: string[];
+    Mobile: string[];
+    Tablet: string[];
+    Widescreen: string[];
 
-    block: string[];
-    blocks: string[];
-    example: string[];
+    Block: string[];
+    Blocks: string[];
 
-    header: string[];
-    field: string[];
-    button: string[];
-    list: string[];
-    image: string[];
-    space: string[];
+    Header: string[];
+    Field: string[];
+    Button: string[];
+    List: string[];
+    Image: string[];
+    Space: string[];
 
-    consists_of: string[];
-    with_icon: string[];
+    ConsistsOf: string[];
+    WithIcon: string[];
 
-    aligned: string[];
-    rows: string[];
-    columns: string[];
+    Aligned: string[];
+    Rows: string[];
+    Columns: string[];
 
-    top: string[];
-    bottom: string[];
-    left: string[];
-    right: string[];
-    center: string[];
+    Top: string[];
+    Bottom: string[];
+    Left: string[];
+    Right: string[];
+    Center: string[];
 }
 
 export interface Dictionary {

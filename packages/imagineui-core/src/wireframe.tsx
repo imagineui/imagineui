@@ -3,12 +3,11 @@ import {WiredButton, WiredInput, WiredDivider, WiredCard} from './wired-elements
 import {
     numberTokenToNumber,
     ParseBlock,
-    ParseColumns,
     IUIItem,
     IUIList,
     IUIPage,
-    ParseRows, IUITextValue,
-    IUIScene,
+    IUITextValue,
+    IUIScene, ParseDirection,
 } from './parse';
 import {wireframeContext} from './store';
 import {IToken} from 'chevrotain';
@@ -109,21 +108,14 @@ const List = ({list, onHover}: {list: IUIList, onHover?: (tokens: IToken[]) => v
     return <div>{list.children.List[0].image}</div>
 }
 
-const getSubblockToken = (subblock: ParseRows | ParseColumns) => {
-    if (subblock.name === 'rows') {
-        return subblock.children.Rows[0]
-    } else {
-        return subblock.children.Columns[0]
-    }
-}
+const getSubblockToken = ({children}: ParseDirection) => (children.Rows || children.Columns)[0]
 
 const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]) => void}) => {
-    const {rows, columns, item, list} = block.children;
+    const {direction, item, list} = block.children;
 
-    const subblocks = [...(rows || []), ...(columns || [])]
-        .sort((a, b) => (
+    const subblocks = direction?.sort((a, b) => (
             getSubblockToken(a).startOffset - getSubblockToken(b).startOffset
-        ))
+        )) || []
 
     // TODO: [tests] Validate that blocks are column-directed by default
     subblocks.unshift({
@@ -133,7 +125,7 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
             item,
             list,
         },
-        name: 'columns',
+        name: 'direction',
     })
 
     if (subblocks.length === 0)
@@ -154,11 +146,11 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
             // TODO: [perf] Make a better
             return <div style={{
                 display: 'flex',
-                flexDirection: subblock.name === 'rows' ? 'column' : 'row',
+                flexDirection: subblock.children.Rows ? 'column' : 'row',
                 justifyContent: 'center',
             }}>
                 {Array(num).fill(0).map((_, i) =>
-                    <div style={{display: 'flex', flexDirection: subblock.name === 'rows' ? 'row' : 'column'}}>
+                    <div style={{display: 'flex', flexDirection: subblock.children.Rows ? 'row' : 'column'}}>
                     {items.filter((value, index) => index % num === i)}
                 </div>)}
             </div>
