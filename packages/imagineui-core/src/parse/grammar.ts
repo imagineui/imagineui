@@ -11,6 +11,9 @@ export class SceneParser extends Parser {
     private readonly scene!: () => any;
     private readonly page!: (idx: number) => any;
     private readonly block!: (idx: number) => any;
+    private readonly blockalign!: (idx: number) => any;
+    private readonly blocks!: (idx: number) => any;
+    private readonly elements!: (idx: number) => any;
     private readonly direction!: (idx: number) => any;
     private readonly item!: (idx: number) => any;
     private readonly value!: (idx: number) => any;
@@ -18,7 +21,6 @@ export class SceneParser extends Parser {
     private readonly comment!: (idx: number) => any;
     private readonly literal!: (idx: number) => any;
     private readonly number!: (idx: number) => any;
-    private readonly blockalign!: (idx: number) => any;
 
     constructor(tokenSets: ReturnType<typeof buildTokensForLocale>, tokens: TokenType[]) {
         super(tokens, {
@@ -66,43 +68,7 @@ export class SceneParser extends Parser {
             // $.CONSUME(WhiteSpace);
             $.SUBRULE($.value);
             $.CONSUME1(LineEnd);
-            $.MANY(() => {
-                $.OR2([
-                    {ALT: () => $.SUBRULE($.block)},
-                    {ALT: () => $.CONSUME2(LineEnd)},
-                    {ALT: () => $.SUBRULE($.blockalign)},
-                ]);
-            })
-        });
-
-        const BLOCK_CONTENT = () => [
-            {ALT: () => $.SUBRULE($.item)},
-            {ALT: () => $.SUBRULE($.list)},
-            {ALT: () => $.CONSUME2(LineEnd)},
-        ]
-        // Top, Bottom, Left, Right, Center
-        $.RULE('block', () => {
-            $.OPTION(() => {
-                $.OR1([
-                    {ALT: () => $.CONSUME2(Top)},
-                    {ALT: () => $.CONSUME2(Bottom)},
-                    {ALT: () => $.CONSUME2(Left)},
-                    {ALT: () => $.CONSUME2(Right)},
-                    {ALT: () => $.CONSUME2(Center)},
-                ])
-            });
-            $.CONSUME(Block);
-            $.SUBRULE($.value);
-            $.CONSUME1(LineEnd);
-            $.MANY1(() => {
-                $.OR2(BLOCK_CONTENT())
-            });
-            $.MANY2(() => {
-                $.OR3([
-                    {ALT: () => $.SUBRULE($.direction)},
-                    {ALT: () => $.CONSUME3(LineEnd)},
-                    ])
-            });
+            $.MANY(() => $.SUBRULE2($.blocks))
         });
 
         $.RULE('direction', () => {
@@ -115,29 +81,37 @@ export class SceneParser extends Parser {
                 {ALT: () => $.CONSUME(Columns)},
             ]);
             $.CONSUME1(LineEnd);
-            $.MANY(() => {
-                $.OR2(BLOCK_CONTENT())
-            });
+        });
+
+        $.RULE('elements', () => {
+            $.OPTION1(() => $.SUBRULE1($.direction))
+            $.MANY(() => $.OR([
+                {ALT: () => $.SUBRULE($.item)},
+                {ALT: () => $.SUBRULE($.list)},
+                {ALT: () => $.CONSUME1(LineEnd)},
+            ]))
+        });
+
+        $.RULE('block', () => {
+            $.CONSUME(Block);
+            $.OPTION1(() => $.SUBRULE($.value));
+            $.CONSUME1(LineEnd);
+            $.MANY(() => $.SUBRULE2($.elements))
         });
 
         $.RULE('blockalign', () => {
             $.CONSUME(Blocks);
-            $.MANY_SEP({
-                SEP: Comma, DEF: () => {
-                    $.SUBRULE($.value);
-                },
-            });
             $.CONSUME(Aligned);
-            // $.CONSUME(In);
-            $.OPTION(() => {
-                $.SUBRULE($.number);
-            });
-            $.OR([
-                {ALT: () => $.CONSUME(Rows)},
-                {ALT: () => $.CONSUME(Columns)},
-            ])
-            $.CONSUME(LineEnd);
+            $.SUBRULE($.direction);
         });
+
+        $.RULE('blocks', () => {
+            $.OPTION1(() => $.SUBRULE1($.blockalign))
+            $.MANY(() => $.OR([
+                {ALT: () => $.SUBRULE2($.block)},
+                {ALT: () => $.CONSUME(LineEnd)},
+            ]))
+        })
 
         $.RULE('item', () => {
             $.OR1([

@@ -1,7 +1,7 @@
 import {SceneParser} from './grammar';
 import {ILexingError, IRecognitionException, IToken, Lexer, TokenType} from 'chevrotain';
 import {detectLocale} from '../locales';
-import {Dictionary, Locale} from '../locales/types';
+import {Locale} from '../locales/types';
 import {buildTokensForLocale} from './tokens';
 
 interface IUIText {
@@ -54,6 +54,37 @@ export const numberTokenToNumber = ({children}: IUINumber) => {
     throw new Error('Parsed number has no tokens')
 }
 
+interface Direction {
+    num: number,
+    direction: 'column' | 'row',
+    containerDirection: 'column' | 'row',
+}
+
+export const directionTokenFlatten = (token: [ParseDirection] | undefined): Direction => {
+    if (!token) return {
+        num: 1,
+        direction: 'column',
+        containerDirection: 'row',
+    }
+
+    const [{children}] = token;
+
+    return {
+        num: children.number ? numberTokenToNumber(children.number[0]) : 1,
+        direction: children.Rows ? 'row' : 'column',
+        containerDirection: children.Rows ? 'column' : 'row',
+    }
+}
+
+export type AlignRule = Direction & {
+    blocks: ParseBlock[],
+}
+
+export const blocksToRule = (token: ParseBlocks): AlignRule => ({
+    blocks: token.children.block || [],
+    ...directionTokenFlatten(token.children.blockalign?.[0].children.direction),
+})
+
 export interface IUITextValue {
     children: {
         NaturalLiteral: [IToken]
@@ -78,22 +109,24 @@ export interface IUIItem {
 
 export interface ParseBlockAlign {
     children: {
-        Blocks: [IToken]
-        value: IUITextValue[]
-        Aligned: [IToken]
-        number?: [IUINumber]
-        Rows?: [IToken]
-        Columns?: [IToken],
+        Blocks: [IToken],
+        Aligned: [IToken],
+        direction?: [ParseDirection],
     }
     name: 'blockalign'
 }
 
+export interface ParseBlocks {
+    children: {
+        blockalign?: [ParseBlockAlign],
+        block: ParseBlock[],
+    }
+    name: 'blocks'
+}
+
 export interface ParseDirection {
     children: {
-        In: [IToken]
-        number?: [IUINumber]
-        item?: IUIItem[]
-        list?: IUIList[],
+        number?: [IUINumber],
     } & ({
         Rows: [IToken],
         Columns?: never,
@@ -104,18 +137,20 @@ export interface ParseDirection {
     name: 'direction'
 }
 
+export interface ParseElements {
+    children: {
+        direction?: [ParseDirection],
+        item?: IUIItem[]
+        list?: IUIList[],
+    },
+    name: 'elements'
+}
+
 export interface ParseBlock {
     children: {
-        Top?: [IToken],
-        Bottom?: [IToken],
-        Left?: [IToken],
-        Right?: [IToken],
-        Center?: [IToken],
         Block: [IToken]
-        value: IUITextValue[]
-        item?: IUIItem[]
-        list?: IUIList[]
-        direction?: ParseDirection[],
+        value?: [IUITextValue]
+        elements?: [ParseElements],
     }
     name: 'block'
 }
@@ -135,8 +170,7 @@ export interface IUIPage {
         Widescreen?: [IToken],
         Page: [IToken],
         value: IToken[],
-        block?: ParseBlock[],
-        blockalign?: ParseBlockAlign[],
+        blocks: ParseBlocks[],
         list: IUIList[],
     }
     name: 'page'

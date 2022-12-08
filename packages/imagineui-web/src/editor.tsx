@@ -155,6 +155,12 @@ Block: Navigation
     Link to Community
     Link to Subscribe
 
+Blocks aligned in two columns
+
+Block: Description
+    Header "DSL for mock-ups"
+    "Open-source tool for low-fidelity mock-ups (wireframes) generation with a format that imitates natural speech."
+    
 Block: Subscription
     Header Subscribe to our newsletter
     Input "full name"
@@ -167,9 +173,8 @@ Block: Subscription
     One column
     "By subscribing, you accept the Privacy Policy"
 
-Block: Description
-    Header "DSL for mock-ups"
-    "Open-source tool for low-fidelity mock-ups (wireframes) generation with a format that imitates natural speech."
+
+Blocks aligned in one column
 
 Block: Partners
     "In enterprises and in outsource, companies try ImagineUI"
@@ -178,7 +183,6 @@ Block: Partners
     consists of
     Image partner logo
 
-Blocks "Description", "Subscription" aligned in two columns
 
 // Format allows localized keywords like Gherkin
 

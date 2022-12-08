@@ -1,13 +1,14 @@
-import React, {createContext, useCallback, useContext} from 'react';
-import {WiredButton, WiredInput, WiredDivider, WiredCard} from './wired-elements-react';
+import React, {useCallback, useContext} from 'react';
+import {WiredButton, WiredCard, WiredInput} from './wired-elements-react';
 import {
-    numberTokenToNumber,
-    ParseBlock,
+    AlignRule, blocksToRule,
+    directionTokenFlatten,
     IUIItem,
     IUIList,
     IUIPage,
+    IUIScene,
     IUITextValue,
-    IUIScene, ParseDirection,
+    ParseBlock,
 } from './parse';
 import {wireframeContext} from './store';
 import {IToken} from 'chevrotain';
@@ -108,32 +109,15 @@ const List = ({list, onHover}: {list: IUIList, onHover?: (tokens: IToken[]) => v
     return <div>{list.children.List[0].image}</div>
 }
 
-const getSubblockToken = ({children}: ParseDirection) => (children.Rows || children.Columns)[0]
-
 const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]) => void}) => {
-    const {direction, item, list} = block.children;
+    const {elements} = block.children;
 
-    const subblocks = direction?.sort((a, b) => (
-            getSubblockToken(a).startOffset - getSubblockToken(b).startOffset
-        )) || []
-
-    // TODO: [tests] Validate that blocks are column-directed by default
-    subblocks.unshift({
-        children: {
-            In: block.children.Block,
-            Columns: block.children.Block,
-            item,
-            list,
-        },
-        name: 'direction',
-    })
-
-    if (subblocks.length === 0)
+    if (!elements?.length)
         return null;
 
     return <>
-        {subblocks.map(subblock => {
-            const num = subblock.children.number ? numberTokenToNumber(subblock.children.number[0]) : 1;
+        {elements.map(subblock => {
+            const {num, direction, containerDirection} = directionTokenFlatten(subblock.children.direction)
 
             const items: JSX.Element[] = []
             subblock.children.item?.forEach(innerItem => items.push(<Item item={innerItem} onHover={onHover}/>))
@@ -143,14 +127,14 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
                 items.push(<WiredCard><List list={innerList} onHover={onHover}/></WiredCard>)
             })
 
-            // TODO: [perf] Make a better
+            // TODO: [perf] Make a better grid renderer
             return <div style={{
                 display: 'flex',
-                flexDirection: subblock.children.Rows ? 'column' : 'row',
+                flexDirection: containerDirection,
                 justifyContent: 'center',
             }}>
                 {Array(num).fill(0).map((_, i) =>
-                    <div style={{display: 'flex', flexDirection: subblock.children.Rows ? 'row' : 'column'}}>
+                    <div style={{display: 'flex', flexDirection: direction}}>
                     {items.filter((value, index) => index % num === i)}
                 </div>)}
             </div>
@@ -158,80 +142,15 @@ const Block = ({block, onHover}: {block: ParseBlock, onHover?: (tokens: IToken[]
     </>
 }
 
-interface AlignRule {
-    name: 'columns' | 'rows'
-    number: number
-    blocks: string[]
-}
-
-const ruleToFrames =
-    (blockRefs: Map<string, ParseBlock>, onHover?: (tokens: IToken[]) => void) => (rule: AlignRule, _: number) =>
-    <div style={{display: 'flex', flexDirection: rule.name === 'rows' ? 'column' : 'row', justifyContent: 'center'}}>
-        {Array(rule.number).fill(0).map((__, i) =>
-            <div style={{display: 'flex', flex: 1, flexDirection: rule.name === 'rows' ? 'row' : 'column'}}>
-                {rule.blocks.filter((value, index) => index % rule.number === i)
-                    .map(block => <Block block={blockRefs.get(block)!} onHover={onHover}/>)}
-            </div>)}
-    </div>
-
 const Page = ({page, onHover}: {page: IUIPage, onHover?: (tokens: IToken[]) => void}) => {
-
-    const {block, blockalign} = page.children;
-
-    const mentions = new Map<string, AlignRule>()
-    const placedMention = new Set<string>()
-
-    const alignRules = blockalign?.map((align): AlignRule => ({
-            name: align.children.Rows ? 'rows' : 'columns',
-            number: align.children.number ? numberTokenToNumber(align.children.number[0]) : 1,
-            blocks: align.children.value.map(getTokenImage),
-        })) ?? [];
-
-    // TODO: [conformity] Throw an error on conflicting mentions
-    alignRules.forEach(rule => rule.blocks.forEach(innerBlock => mentions.set(innerBlock, rule)))
-
-    // const rules = block ? block.map(block => block.children.value.map(getTokenImage).join(', ')) : []
-
-    const topRules: AlignRule[] = []
-    const centerRules: AlignRule[] = []
-    const bottomRules: AlignRule[] = []
-    const blockRefs = new Map<string, ParseBlock>();
-    const ruleRenderer = ruleToFrames(blockRefs, onHover)
-
-    block?.forEach(ref => {
-        const image = getTokenImage(ref.children.value[0])
-
-        blockRefs.set(image, ref)
-
-        if (placedMention.has(image))
-            return
-
-        const rule = mentions.get(image);
-
-        const {Top, Center, Bottom} = ref.children;
-
-        let rules = topRules;
-        if (Center) rules = centerRules;
-        if (Bottom) rules = bottomRules;
-
-        if (rule) {
-            rules.push(rule)
-            rule.blocks.forEach(innerBlock => placedMention.add(innerBlock))
-            return
-        }
-
-        rules.push({
-            name: 'columns',
-            number: 1,
-            blocks: [image],
-        })
-        // TODO: [conformity] Throw an error on duplicates
-        placedMention.add(image)
-    })
-
-    const topBlocks = topRules.map(ruleRenderer);
-    const centerBlocks = centerRules.map(ruleRenderer);
-    const bottomBlocks = bottomRules.map(ruleRenderer);
+    const blocks = page.children.blocks.map(ref => blocksToRule(ref)).map((rule, _) =>
+      <div style={{display: 'flex', flexDirection: rule.containerDirection, justifyContent: 'center'}}>
+          {Array(rule.num).fill(0).map((__, i) =>
+            <div style={{display: 'flex', flex: 1, flexDirection: rule.direction}}>
+                {rule.blocks.filter((value, index) => index % rule.num === i)
+                  .map(block => <Block block={block} onHover={onHover}/>)}
+            </div>)}
+      </div>)
 
     const width = getPageWidth(page)
     const minHeight = getPageHeight(page) || 'unset'
@@ -239,17 +158,12 @@ const Page = ({page, onHover}: {page: IUIPage, onHover?: (tokens: IToken[]) => v
     if (width) {
         return <WiredCard>
             <div style={{width, minHeight, overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
-                {topBlocks}
-                <div style={{flex: 1, display: 'flex', alignItems: 'center',
-                    justifyContent: 'center'}}>{centerBlocks}</div>
-                {bottomBlocks}
+                {blocks}
             </div>
         </WiredCard>
     } else {
         return <>
-            {topBlocks}
-            {centerBlocks}
-            {bottomBlocks}
+            {blocks}
         </>
     }
 }
