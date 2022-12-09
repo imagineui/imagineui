@@ -46,7 +46,8 @@ const Item = ({item, onHover}: {item: IUIItem, onHover?: (tokens: IToken[]) => v
     } else if (textEl) {
         const {StringLiteral, Variable} = textEl[0].children;
         if (StringLiteral)
-            text = StringLiteral[0].image.substring(1, StringLiteral[0].image.length - 1).replace(/\\"/g, '"')
+            text = StringLiteral[0].image.substring(1, StringLiteral[0].image.length - 1)
+              .replace(/\\(["«»\\])/g, (_, group) => group)
         if (Variable)
             text = '[WIP] Подстановки переменных'
     }

@@ -98,6 +98,30 @@ const syntax = `
                     </dict>
                     <dict>
                         <key>begin</key>
+                        <string>[^\\x{005c}][«»][«»]</string>
+                        <key>beginCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                        <key>contentName</key>
+                        <string>text.imagineui_scene</string>
+                        <key>end</key>
+                        <string></string>
+                        <key>endCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                    </dict>
+                    <dict>
+                        <key>begin</key>
                         <string>[^\\x{005c}]"</string>
                         <key>beginCaptures</key>
                         <dict>
@@ -111,6 +135,30 @@ const syntax = `
                         <string>text.imagineui_scene</string>
                         <key>end</key>
                         <string>[^\\x{005c}]"</string>
+                        <key>endCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                    </dict>
+                    <dict>
+                        <key>begin</key>
+                        <string>[^\\x{005c}][«»]</string>
+                        <key>beginCaptures</key>
+                        <dict>
+                            <key>1</key>
+                            <dict>
+                                <key>name</key>
+                                <string>text.imagineui_scene</string>
+                            </dict>
+                        </dict>
+                        <key>contentName</key>
+                        <string>text.imagineui_scene</string>
+                        <key>end</key>
+                        <string>[^\\x{005c}][«»]</string>
                         <key>endCaptures</key>
                         <dict>
                             <key>1</key>
