@@ -285,7 +285,7 @@ export const Editor = ({onChange}:
                 editor.layout()
             })
         }
-    }, [container])
+    }, [container, onChange])
 
     return <div ref={container}/>
 }

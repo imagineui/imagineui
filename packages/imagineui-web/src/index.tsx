@@ -66,12 +66,13 @@ const Playground = () => {
     }, [setSceneAST])
 
     const onHover = useCallback((tokens: IToken[]) => {
-        oldDecorations = theEditor && theEditor.deltaDecorations(oldDecorations, tokens.map((token): monaco.editor.IModelDeltaDecoration => ({
-            range: tokenRange(token),
-            options: {
-                className: `token token__${token.tokenType.name}`,
-            },
-        }))) || []
+        oldDecorations = theEditor?.deltaDecorations(oldDecorations,
+            tokens.map((token): monaco.editor.IModelDeltaDecoration => ({
+              range: tokenRange(token),
+              options: {
+                  className: `token token__${token.tokenType.name}`,
+              },
+          }))) || []
     }, [])
 
     return <div className='sandbox__view'>
