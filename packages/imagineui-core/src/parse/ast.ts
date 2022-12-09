@@ -54,13 +54,13 @@ export const numberTokenToNumber = ({children}: IUINumber) => {
     throw new Error('Parsed number has no tokens')
 }
 
-interface Direction {
+export interface DirectionDescription {
     num: number,
     direction: 'column' | 'row',
     containerDirection: 'column' | 'row',
 }
 
-export const directionTokenFlatten = (token: [ParseDirection] | undefined): Direction => {
+export const directionTokenFlatten = (token: [ParseDirection] | undefined): DirectionDescription => {
     if (!token) return {
         num: 1,
         direction: 'column',
@@ -76,7 +76,7 @@ export const directionTokenFlatten = (token: [ParseDirection] | undefined): Dire
     }
 }
 
-export type AlignRule = Direction & {
+export type AlignRule = DirectionDescription & {
     blocks: ParseBlock[],
 }
 
@@ -103,8 +103,16 @@ export interface IUIItem {
         Header?: [IToken]
         value?: [IUITextValue]
         literal?: [IUIText],
+        size?: [ParseSize],
     }
     name: 'item'
+}
+
+export interface ParseSize {
+    children: {
+        FillingTheScreen?: [IToken],
+    }
+    name: 'size'
 }
 
 export interface ParseBlockAlign {
@@ -232,18 +240,14 @@ export function parseSceneToAST(sceneText: string): IUIParseResult {
         const {
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Field, Button, Header, List, Image, Space,
-            Aligned, WithIcon, ConsistsOf,
-            Rows, Columns,
-            Top, Bottom, Left, Right, Center,
+            ...restOfTokens
         } = tokenSets.TokenSet;
 
         const tokens = [LineEnd, WhiteSpace, Comment, NumberLiteral, StringLiteral, Variable,
             Page, Mobile, Tablet, Widescreen,
             Block, Blocks,
-            Comma, Colon, Field, Button, Header, List, Image, Space,
-            Aligned, Rows, Columns, WithIcon, ConsistsOf,
-            Top, Bottom, Left, Right, Center,
+            Comma, Colon,
+            ...Object.values(restOfTokens),
             ...Object.values(tokenSets.NumericTokenSet),
             NaturalLiteral];
 

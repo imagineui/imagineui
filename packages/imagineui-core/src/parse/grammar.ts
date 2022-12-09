@@ -16,6 +16,7 @@ export class SceneParser extends Parser {
     private readonly elements!: (idx: number) => any;
     private readonly direction!: (idx: number) => any;
     private readonly item!: (idx: number) => any;
+    private readonly size!: (idx: number) => any;
     private readonly value!: (idx: number) => any;
     private readonly list!: (idx: number) => any;
     private readonly comment!: (idx: number) => any;
@@ -36,6 +37,7 @@ export class SceneParser extends Parser {
             Block, Blocks,
             Field, Button, Header, List, Image, Space,
             Aligned, WithIcon, ConsistsOf,
+            FillingTheScreen,
             Top, Bottom, Left, Right, Center,
             Rows, Columns,
         } = tokenSets.TokenSet;
@@ -113,18 +115,33 @@ export class SceneParser extends Parser {
             ]))
         })
 
+        $.RULE('size', () => {
+            $.CONSUME(FillingTheScreen)
+        })
+
         $.RULE('item', () => {
             $.OR1([
                 {ALT: () => {
                     $.OR2([
-                            {ALT: () => $.CONSUME(Field)},
-                            {ALT: () => $.CONSUME(Button)},
-                            {ALT: () => $.CONSUME(Header)},
-                            {ALT: () => $.CONSUME(Image)},
-                            {ALT: () => $.CONSUME(Space)},
-                        ]);
-                    $.OPTION(() => $.SUBRULE($.value))
-                    }},
+                        {ALT: () => $.CONSUME1(Field)},
+                        {ALT: () => $.CONSUME1(Button)},
+                        {ALT: () => $.CONSUME1(Header)},
+                    ]);
+                    $.OPTION1(() => $.SUBRULE1($.value))
+                }},
+                {ALT: () => {
+                    $.OR3([
+                        {ALT: () => {
+                            $.CONSUME2(Image)
+                            $.OPTION2(() => $.SUBRULE2($.value))
+                        }},
+                        {ALT: () => {
+                            $.CONSUME2(Space)
+                        }},
+                    ]);
+
+                    $.OPTION3(() => $.SUBRULE3($.size))
+                }},
                 {ALT: () => $.SUBRULE($.literal)},
             ]);
             $.CONSUME(LineEnd);

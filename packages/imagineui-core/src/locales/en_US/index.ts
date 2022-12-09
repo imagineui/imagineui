@@ -2,7 +2,7 @@ import {Dictionary, KeywordDictionary, Locale, NumericDictionary} from '../types
 
 const numbers: NumericDictionary = {
     Zero: ['zero'],
-    One: ['one'],
+    One: ['one', 'a'],
     Two: ['two'],
     Three: ['three'],
     Four: ['four'],
@@ -37,6 +37,8 @@ const keywords: KeywordDictionary = {
     WithIcon: ['with an icon'],
     Rows: ['rows', 'row'],
     Columns: ['columns', 'column'],
+
+    FillingTheScreen: ['filling the screen', 'filling screen'],
 
     Top: ['top', 'above'],
     Bottom: ['bottom', 'below'],

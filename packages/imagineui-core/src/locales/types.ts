@@ -47,6 +47,8 @@ export interface KeywordDictionary {
     Rows: string[];
     Columns: string[];
 
+    FillingTheScreen: string[];
+
     Top: string[];
     Bottom: string[];
     Left: string[];
